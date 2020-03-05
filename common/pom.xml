@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fastutil-parent</artifactId>
+        <groupId>com.nukkitx.fastutil</groupId>
+        <version>8.3.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fastutil-common</artifactId>
+
+    <build>
+        <sourceDirectory>${maven.multiModuleProjectDirectory}/src</sourceDirectory>
+        <testSourceDirectory>${maven.multiModuleProjectDirectory}/test</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <artifactId>exec-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <executions>
+                    <execution>
+                        <id>make-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>${main.dir}</workingDirectory>
+                            <executable>./makeSources.sh</executable>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <!-- Misc -->
+                        <include>${package}/Arrays.java</include>
+                        <include>${package}/**/*Arrays.java</include>
+                        <include>${package}/Function.java</include>
+                        <include>${package}/Hash.java</include>
+                        <include>${package}/Stack.java</include>
+                        <include>${package}/HashCommon.java</include>
+                        <include>${package}/SafeMath.java</include>
+                        <include>${package}/BidirectionalIterator.java</include>
+                        <include>${package}/objects/ObjectBidirectionalIterator.java</include>
+                        <include>${package}/PriorityQueue.java</include>
+                        <include>${package}/PriorityQueues.java</include>
+                        <include>${package}/IndirectPriorityQueue.java</include>
+                        <include>${package}/IndirectPriorityQueues.java</include>
+                        <include>${package}/BigList.java</include>
+                        <include>${package}/BigListIterator.java</include>
+                        <include>${package}/Size64.java</include>
+                        <include>${package}/**/*Consumer.java</include>
+                        <!-- Iterators -->
+                        <include>${package}/objects/ObjectIterator.java</include>
+                        <include>${package}/booleans/BooleanIterator.java</include>
+                        <include>${package}/bytes/ByteIterator.java</include>
+                        <include>${package}/chars/CharIterator.java</include>
+                        <include>${package}/shorts/ShortIterator.java</include>
+                        <include>${package}/ints/IntIterator.java</include>
+                        <include>${package}/longs/LongIterator.java</include>
+                        <include>${package}/floats/FloatIterator.java</include>
+                        <include>${package}/doubles/DoubleIterator.java</include>
+                    </includes>
+                    <testIncludes>
+                        <testInclude>${package}/ArraysTest.java</testInclude>
+                        <testInclude>${package}/HashCommonTest.java</testInclude>
+                    </testIncludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

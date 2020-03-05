@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fastutil-queue-parent</artifactId>
+        <groupId>com.nukkitx.fastutil</groupId>
+        <version>8.3.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fastutil-short-queues</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nukkitx.fastutil</groupId>
+            <artifactId>fastutil-short-common</artifactId>
+            <version>8.3.1</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${maven.multiModuleProjectDirectory}/src</sourceDirectory>
+        <testSourceDirectory>${maven.multiModuleProjectDirectory}/test</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <!-- Direct -->
+                        <include>${package}/shorts/ShortPriorityQueue.java</include>
+                        <include>${package}/shorts/ShortArrayFIFOQueue.java</include>
+                        <include>${package}/shorts/ShortArrayPriorityQueue.java</include>
+                        <include>${package}/shorts/ShortHeapPriorityQueue.java</include>
+                        <include>${package}/shorts/ShortHeaps.java</include>
+                        <include>${package}/shorts/ShortPriorityQueues.java</include>
+                        <!-- Indirect -->
+                        <include>${package}/shorts/ShortIndirectPriorityQueue.java</include>
+                        <include>${package}/shorts/ShortArrayIndirectPriorityQueue.java</include>
+                        <include>${package}/shorts/ShortHeapIndirectPriorityQueue.java</include>
+                        <include>${package}/shorts/ShortHeapSemiIndirectPriorityQueue.java</include>
+                        <include>${package}/shorts/ShortIndirectHeaps.java</include>
+                    </includes>
+                    <testIncludes>
+                        <testInclude>noop</testInclude>
+                    </testIncludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

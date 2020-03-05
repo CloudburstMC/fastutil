@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fastutil-set-parent</artifactId>
+        <groupId>com.nukkitx.fastutil</groupId>
+        <version>8.3.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fastutil-byte-sets</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nukkitx.fastutil</groupId>
+            <artifactId>fastutil-byte-common</artifactId>
+            <version>8.3.1</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${maven.multiModuleProjectDirectory}/src</sourceDirectory>
+        <testSourceDirectory>${maven.multiModuleProjectDirectory}/test</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <!-- Unsorted -->
+                        <include>${package}/bytes/ByteSet.java</include>
+                        <include>${package}/bytes/ByteSets.java</include>
+                        <include>${package}/bytes/AbstractByteSet.java</include>
+                        <include>${package}/bytes/ByteArraySet.java</include>
+                        <include>${package}/bytes/ByteOpenCustomHashSet.java</include>
+                        <include>${package}/bytes/ByteOpenHashSet.java</include>
+                        <!-- Sorted -->
+                        <include>${package}/bytes/ByteSortedSet.java</include>
+                        <include>${package}/bytes/ByteSortedSets.java</include>
+                        <include>${package}/bytes/AbstractByteSortedSet.java</include>
+                        <include>${package}/bytes/ByteAVLTreeSet.java</include>
+                        <include>${package}/bytes/ByteLinkedOpenCustomHashSet.java</include>
+                        <include>${package}/bytes/ByteLinkedOpenHashSet.java</include>
+                        <include>${package}/bytes/ByteRBTreeSet.java</include>
+                    </includes>
+                    <testIncludes>
+                        <testInclude>${package}/bytes/ByteSetsTest.java</testInclude>
+                    </testIncludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

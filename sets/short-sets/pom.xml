@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fastutil-set-parent</artifactId>
+        <groupId>com.nukkitx.fastutil</groupId>
+        <version>8.3.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fastutil-short-sets</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nukkitx.fastutil</groupId>
+            <artifactId>fastutil-short-common</artifactId>
+            <version>8.3.1</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${maven.multiModuleProjectDirectory}/src</sourceDirectory>
+        <testSourceDirectory>${maven.multiModuleProjectDirectory}/test</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <!-- Unsorted -->
+                        <include>${package}/shorts/ShortSet.java</include>
+                        <include>${package}/shorts/ShortSets.java</include>
+                        <include>${package}/shorts/AbstractShortSet.java</include>
+                        <include>${package}/shorts/ShortArraySet.java</include>
+                        <include>${package}/shorts/ShortOpenCustomHashSet.java</include>
+                        <include>${package}/shorts/ShortOpenHashSet.java</include>
+                        <!-- Sorted -->
+                        <include>${package}/shorts/ShortSortedSet.java</include>
+                        <include>${package}/shorts/ShortSortedSets.java</include>
+                        <include>${package}/shorts/AbstractShortSortedSet.java</include>
+                        <include>${package}/shorts/ShortAVLTreeSet.java</include>
+                        <include>${package}/shorts/ShortLinkedOpenCustomHashSet.java</include>
+                        <include>${package}/shorts/ShortLinkedOpenHashSet.java</include>
+                        <include>${package}/shorts/ShortRBTreeSet.java</include>
+                    </includes>
+                    <testIncludes>
+                        <testInclude>${package}/shorts/ShortSetsTest.java</testInclude>
+                    </testIncludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

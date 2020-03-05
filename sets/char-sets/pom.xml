@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fastutil-set-parent</artifactId>
+        <groupId>com.nukkitx.fastutil</groupId>
+        <version>8.3.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fastutil-char-sets</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nukkitx.fastutil</groupId>
+            <artifactId>fastutil-char-common</artifactId>
+            <version>8.3.1</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${maven.multiModuleProjectDirectory}/src</sourceDirectory>
+        <testSourceDirectory>${maven.multiModuleProjectDirectory}/test</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <!-- Unsorted -->
+                        <include>${package}/chars/CharSet.java</include>
+                        <include>${package}/chars/CharSets.java</include>
+                        <include>${package}/chars/AbstractCharSet.java</include>
+                        <include>${package}/chars/CharArraySet.java</include>
+                        <include>${package}/chars/CharOpenCustomHashSet.java</include>
+                        <include>${package}/chars/CharOpenHashSet.java</include>
+                        <!-- Sorted -->
+                        <include>${package}/chars/CharSortedSet.java</include>
+                        <include>${package}/chars/CharSortedSets.java</include>
+                        <include>${package}/chars/AbstractCharSortedSet.java</include>
+                        <include>${package}/chars/CharAVLTreeSet.java</include>
+                        <include>${package}/chars/CharLinkedOpenCustomHashSet.java</include>
+                        <include>${package}/chars/CharLinkedOpenHashSet.java</include>
+                        <include>${package}/chars/CharRBTreeSet.java</include>
+                    </includes>
+                    <testIncludes>
+                        <testInclude>${package}/chars/CharSetsTest.java</testInclude>
+                    </testIncludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

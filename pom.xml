@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.nukkitx.fastutil</groupId>
+    <artifactId>fastutil-parent</artifactId>
+    <packaging>pom</packaging>
+    <name>fastutil</name>
+    <version>8.3.1</version>
+    <description>fastutil extends the Java Collections Framework by providing type-specific maps, sets, lists and
+        priority queues with a small memory footprint and fast access and insertion; provides also big (64-bit) arrays,
+        sets and lists, and fast, practical I/O classes for binary and text files.
+    </description>
+    <url>http://fastutil.di.unimi.it/</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git://github.com/vigna/fastutil.git</connection>
+        <url>https://github.com/vigna/fastutil</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>vigna</id>
+            <name>Sebastiano Vigna</name>
+            <email>vigna@di.unimi.it</email>
+        </developer>
+    </developers>
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <package>it/unimi/dsi/fastutil</package>
+    </properties>
+
+    <modules>
+        <module>common</module>
+        <module>commons</module>
+        <module>io</module>
+        <module>sets</module>
+        <module>queues</module>
+        <module>maps</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

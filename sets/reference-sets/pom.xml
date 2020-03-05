@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fastutil-set-parent</artifactId>
+        <groupId>com.nukkitx.fastutil</groupId>
+        <version>8.3.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fastutil-reference-sets</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nukkitx.fastutil</groupId>
+            <artifactId>fastutil-reference-common</artifactId>
+            <version>8.3.1</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${maven.multiModuleProjectDirectory}/src</sourceDirectory>
+        <testSourceDirectory>${maven.multiModuleProjectDirectory}/test</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <!-- Unsorted -->
+                        <include>${package}/objects/ReferenceSet.java</include>
+                        <include>${package}/objects/ReferenceSets.java</include>
+                        <include>${package}/objects/AbstractReferenceSet.java</include>
+                        <include>${package}/objects/ReferenceArraySet.java</include>
+                        <include>${package}/objects/ReferenceOpenCustomHashSet.java</include>
+                        <include>${package}/objects/ReferenceOpenHashSet.java</include>
+                        <!-- Sorted -->
+                        <include>${package}/objects/ReferenceSortedSet.java</include>
+                        <include>${package}/objects/ReferenceSortedSets.java</include>
+                        <include>${package}/objects/AbstractReferenceSortedSet.java</include>
+                        <include>${package}/objects/ReferenceAVLTreeSet.java</include>
+                        <include>${package}/objects/ReferenceLinkedOpenCustomHashSet.java</include>
+                        <include>${package}/objects/ReferenceLinkedOpenHashSet.java</include>
+                        <include>${package}/objects/ReferenceRBTreeSet.java</include>
+                    </includes>
+                    <testIncludes>
+                        <testInclude>noop</testInclude>
+                    </testIncludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

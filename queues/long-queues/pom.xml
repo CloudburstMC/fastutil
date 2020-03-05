@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fastutil-queue-parent</artifactId>
+        <groupId>com.nukkitx.fastutil</groupId>
+        <version>8.3.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fastutil-long-queues</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nukkitx.fastutil</groupId>
+            <artifactId>fastutil-long-common</artifactId>
+            <version>8.3.1</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${maven.multiModuleProjectDirectory}/src</sourceDirectory>
+        <testSourceDirectory>${maven.multiModuleProjectDirectory}/test</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <!-- Direct -->
+                        <include>${package}/longs/LongPriorityQueue.java</include>
+                        <include>${package}/longs/LongArrayFIFOQueue.java</include>
+                        <include>${package}/longs/LongArrayPriorityQueue.java</include>
+                        <include>${package}/longs/LongHeapPriorityQueue.java</include>
+                        <include>${package}/longs/LongHeaps.java</include>
+                        <include>${package}/longs/LongPriorityQueues.java</include>
+                        <!-- Indirect -->
+                        <include>${package}/longs/LongIndirectPriorityQueue.java</include>
+                        <include>${package}/longs/LongArrayIndirectPriorityQueue.java</include>
+                        <include>${package}/longs/LongHeapIndirectPriorityQueue.java</include>
+                        <include>${package}/longs/LongHeapSemiIndirectPriorityQueue.java</include>
+                        <include>${package}/longs/LongIndirectHeaps.java</include>
+                    </includes>
+                    <testIncludes>
+                        <testInclude>noop</testInclude>
+                    </testIncludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

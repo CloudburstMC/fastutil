@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fastutil-map-parent</artifactId>
+        <groupId>com.nukkitx.fastutil</groupId>
+        <version>8.3.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <packaging>pom</packaging>
+    <artifactId>fastutil-int-map-parent</artifactId>
+
+    <modules>
+        <module>int-object-maps</module>
+        <module>int-reference-maps</module>
+        <module>int-boolean-maps</module>
+        <module>int-byte-maps</module>
+        <module>int-char-maps</module>
+        <module>int-short-maps</module>
+        <module>int-int-maps</module>
+        <module>int-long-maps</module>
+        <module>int-float-maps</module>
+        <module>int-double-maps</module>
+        <module>int-all-maps</module>
+    </modules>
+</project>

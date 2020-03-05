@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fastutil-set-parent</artifactId>
+        <groupId>com.nukkitx.fastutil</groupId>
+        <version>8.3.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fastutil-long-sets</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nukkitx.fastutil</groupId>
+            <artifactId>fastutil-long-common</artifactId>
+            <version>8.3.1</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${maven.multiModuleProjectDirectory}/src</sourceDirectory>
+        <testSourceDirectory>${maven.multiModuleProjectDirectory}/test</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <!-- Unsorted -->
+                        <include>${package}/longs/LongSet.java</include>
+                        <include>${package}/longs/LongSets.java</include>
+                        <include>${package}/longs/AbstractLongSet.java</include>
+                        <include>${package}/longs/LongArraySet.java</include>
+                        <include>${package}/longs/LongOpenCustomHashSet.java</include>
+                        <include>${package}/longs/LongOpenHashSet.java</include>
+                        <!-- Sorted -->
+                        <include>${package}/longs/LongSortedSet.java</include>
+                        <include>${package}/longs/LongSortedSets.java</include>
+                        <include>${package}/longs/AbstractLongSortedSet.java</include>
+                        <include>${package}/longs/LongAVLTreeSet.java</include>
+                        <include>${package}/longs/LongLinkedOpenCustomHashSet.java</include>
+                        <include>${package}/longs/LongLinkedOpenHashSet.java</include>
+                        <include>${package}/longs/LongRBTreeSet.java</include>
+                    </includes>
+                    <testIncludes>
+                        <testInclude>${package}/longs/LongSetsTest.java</testInclude>
+                    </testIncludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

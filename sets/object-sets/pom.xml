@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fastutil-set-parent</artifactId>
+        <groupId>com.nukkitx.fastutil</groupId>
+        <version>8.3.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fastutil-object-sets</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nukkitx.fastutil</groupId>
+            <artifactId>fastutil-object-common</artifactId>
+            <version>8.3.1</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${maven.multiModuleProjectDirectory}/src</sourceDirectory>
+        <testSourceDirectory>${maven.multiModuleProjectDirectory}/test</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <!-- Unsorted -->
+                        <include>${package}/objects/ObjectSet.java</include>
+                        <include>${package}/objects/ObjectSets.java</include>
+                        <include>${package}/objects/AbstractObjectSet.java</include>
+                        <include>${package}/objects/ObjectArraySet.java</include>
+                        <include>${package}/objects/ObjectOpenCustomHashSet.java</include>
+                        <include>${package}/objects/ObjectOpenHashSet.java</include>
+                        <!-- Sorted -->
+                        <include>${package}/objects/ObjectSortedSet.java</include>
+                        <include>${package}/objects/ObjectSortedSets.java</include>
+                        <include>${package}/objects/AbstractObjectSortedSet.java</include>
+                        <include>${package}/objects/ObjectAVLTreeSet.java</include>
+                        <include>${package}/objects/ObjectLinkedOpenCustomHashSet.java</include>
+                        <include>${package}/objects/ObjectLinkedOpenHashSet.java</include>
+                        <include>${package}/objects/ObjectRBTreeSet.java</include>
+                    </includes>
+                    <testIncludes>
+                        <testInclude>${package}/objects/ObjectSetsTest.java</testInclude>
+                    </testIncludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

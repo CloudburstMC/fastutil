@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fastutil-set-parent</artifactId>
+        <groupId>com.nukkitx.fastutil</groupId>
+        <version>8.3.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fastutil-boolean-sets</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nukkitx.fastutil</groupId>
+            <artifactId>fastutil-boolean-common</artifactId>
+            <version>8.3.1</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${maven.multiModuleProjectDirectory}/src</sourceDirectory>
+        <testSourceDirectory>${maven.multiModuleProjectDirectory}/test</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <!-- Unsorted -->
+                        <include>${package}/booleans/BooleanSet.java</include>
+                        <include>${package}/booleans/BooleanSets.java</include>
+                        <include>${package}/booleans/AbstractBooleanSet.java</include>
+                        <include>${package}/booleans/BooleanArraySet.java</include>
+                        <include>${package}/booleans/BooleanOpenCustomHashSet.java</include>
+                        <include>${package}/booleans/BooleanOpenHashSet.java</include>
+                        <!-- Sorted -->
+                        <include>${package}/booleans/BooleanSortedSet.java</include>
+                        <include>${package}/booleans/BooleanSortedSets.java</include>
+                        <include>${package}/booleans/AbstractBooleanSortedSet.java</include>
+                        <include>${package}/booleans/BooleanAVLTreeSet.java</include>
+                        <include>${package}/booleans/BooleanLinkedOpenCustomHashSet.java</include>
+                        <include>${package}/booleans/BooleanLinkedOpenHashSet.java</include>
+                        <include>${package}/booleans/BooleanRBTreeSet.java</include>
+                    </includes>
+                    <testIncludes>
+                        <testInclude>${package}/booleans/BooleanSetsTest.java</testInclude>
+                    </testIncludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

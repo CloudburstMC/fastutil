@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fastutil-parent</artifactId>
+        <groupId>com.nukkitx.fastutil</groupId>
+        <version>8.3.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <packaging>pom</packaging>
+    <artifactId>fastutil-queue-parent</artifactId>
+
+    <modules>
+        <module>object-queues</module>
+        <module>boolean-queues</module>
+        <module>byte-queues</module>
+        <module>char-queues</module>
+        <module>short-queues</module>
+        <module>int-queues</module>
+        <module>long-queues</module>
+        <module>float-queues</module>
+        <module>double-queues</module>
+        <module>all-queues</module>
+    </modules>
+</project>

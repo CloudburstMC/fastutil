@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fastutil-queue-parent</artifactId>
+        <groupId>com.nukkitx.fastutil</groupId>
+        <version>8.3.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fastutil-boolean-queues</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nukkitx.fastutil</groupId>
+            <artifactId>fastutil-boolean-common</artifactId>
+            <version>8.3.1</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${maven.multiModuleProjectDirectory}/src</sourceDirectory>
+        <testSourceDirectory>${maven.multiModuleProjectDirectory}/test</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <!-- Direct -->
+                        <include>${package}/booleans/BooleanPriorityQueue.java</include>
+                        <include>${package}/booleans/BooleanArrayFIFOQueue.java</include>
+                        <include>${package}/booleans/BooleanArrayPriorityQueue.java</include>
+                        <include>${package}/booleans/BooleanHeapPriorityQueue.java</include>
+                        <include>${package}/booleans/BooleanHeaps.java</include>
+                        <include>${package}/booleans/BooleanPriorityQueues.java</include>
+                        <!-- Indirect -->
+                        <include>${package}/booleans/BooleanIndirectPriorityQueue.java</include>
+                        <include>${package}/booleans/BooleanArrayIndirectPriorityQueue.java</include>
+                        <include>${package}/booleans/BooleanHeapIndirectPriorityQueue.java</include>
+                        <include>${package}/booleans/BooleanHeapSemiIndirectPriorityQueue.java</include>
+                        <include>${package}/booleans/BooleanIndirectHeaps.java</include>
+                    </includes>
+                    <testIncludes>
+                        <testInclude>noop</testInclude>
+                    </testIncludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
