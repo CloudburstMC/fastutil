@@ -18,7 +18,7 @@ pipeline {
                 branch 'master';
             }
             steps {
-                sh 'mvn javadoc:aggregate javadoc:jar source:jar deploy -DskipTests'
+                sh 'mvn -T 1C javadoc:aggregate javadoc:jar source:jar deploy -DskipTests'
                 step([$class: 'JavadocArchiver',
                         javadocDir: 'target/site/apidocs',
                         keepAll: false])
