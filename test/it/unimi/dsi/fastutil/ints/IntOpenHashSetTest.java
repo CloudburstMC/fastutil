@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil.ints;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +13,8 @@ package it.unimi.dsi.fastutil.ints;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package it.unimi.dsi.fastutil.ints;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -30,6 +30,7 @@ import org.junit.Test;
 
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.HashCommon;
+import it.unimi.dsi.fastutil.MainRunner;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 @SuppressWarnings("rawtypes")
@@ -59,14 +60,23 @@ public class IntOpenHashSetTest {
 	}
 
 	@Test
-	public void testInfiniteLoop0() {
-		final IntOpenHashSet set = new IntOpenHashSet(4, 1.0f);
-		set.add(1);
-		set.add(2);
-		set.add(3);
-		set.remove(2);
-		set.trim();
-		set.remove(1); // Will hang inside this call
+	public void testEqualsSameType() {
+		final IntOpenHashSet s = new IntOpenHashSet(new int[] { 1, 2, 3 });
+		assertTrue(s.equals(new IntOpenHashSet(new int[] { 1, 2, 3 })));
+	}
+
+	@SuppressWarnings("unlikely-arg-type")
+	@Test
+	public void testEqualsIntSetType() {
+		final IntOpenHashSet s = new IntOpenHashSet(new int[] { 1, 2, 3 });
+		assertTrue(s.equals(new IntArraySet(new int[] { 1, 2, 3 })));
+	}
+
+	@SuppressWarnings({ "boxing", "unlikely-arg-type" })
+	@Test
+	public void testEqualsObjectSet() {
+		final IntOpenHashSet s = new IntOpenHashSet(new int[] { 1, 2, 3 });
+		assertTrue(s.equals(new ObjectOpenHashSet<>(new Integer[] { 1, 2, 3 })));
 	}
 
 	@Test
@@ -131,7 +141,7 @@ public class IntOpenHashSetTest {
 	@Test
 	public void testSmallExpectedValuesWeirdLoadFactors() {
 		for(int expected = 0; expected < 5; expected ++)
-			for(final float loadFactor: new float[] { Float.MIN_VALUE, .25f, .5f, .75f, 1 - Float.MIN_VALUE }) {
+			for(final float loadFactor: new float[] { Float.MIN_VALUE, .25f, .5f, .75f, 0.9999999f }) {
 				final IntOpenHashSet s = new IntOpenHashSet(0, loadFactor);
 				assertTrue(s.add(2));
 				assertTrue(s.add(3));
@@ -291,6 +301,87 @@ public class IntOpenHashSetTest {
 		assertEquals(8, s.n);
 	}
 
+	@Test
+	public void testOf() {
+		final IntOpenHashSet s = IntOpenHashSet.of(0, 1, 2);
+		assertEquals(new IntOpenHashSet(new int[] { 0, 1, 2 }), s);
+	}
+
+	@Test
+	public void testOfEmpty() {
+		final IntOpenHashSet s = IntOpenHashSet.of();
+		assertTrue(s.isEmpty());
+	}
+
+	@Test
+	public void testOfSingleton() {
+		final IntOpenHashSet s = IntOpenHashSet.of(0);
+		assertEquals(new IntOpenHashSet(new int[] { 0 }), s);
+	}
+
+	@Test
+	public void testForEachRemaining() {
+		// This set of extremely contorted parameters is necessary to trigger the usage of wrapped
+		final IntOpenHashSet s = new IntOpenHashSet(0, .99f);
+		s.add(1);
+		s.iterator().forEachRemaining(x -> {
+		});
+		s.add(0);
+		s.iterator().forEachRemaining(x -> {
+		});
+
+		for (int i = 2; i < 1000; i++) s.add(i);
+
+		final IntIterator it = s.iterator();
+		for (int i = 1; i < 990; i++) {
+			it.nextInt();
+			it.remove();
+		}
+
+		it.forEachRemaining(x -> {
+		});
+	}
+
+	@Test
+	public void testForEach() {
+		final IntOpenHashSet s = new IntOpenHashSet();
+		for (int i = 0; i < 100; i++) s.add(i);
+		final int[] c = new int[1];
+		s.forEach(x -> c[0] += x);
+		assertEquals((100 * 99) / 2, c[0]);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testOfDuplicateThrows() {
+		IntOpenHashSet.of(0, 0);
+	}
+
+	@Test
+	public void testToSet() {
+		final IntOpenHashSet baseSet = IntOpenHashSet.of(2, 380, 1297);
+		final IntOpenHashSet transformed = IntOpenHashSet.toSet(baseSet.intStream().map(i -> i + 40));
+		assertEquals(IntOpenHashSet.of(42, 420, 1337), transformed);
+	}
+
+	@Test
+	public void testSpliteratorTrySplit() {
+		final IntOpenHashSet baseSet = IntOpenHashSet.of(0, 1, 2, 3, 72, 5, 6);
+		final IntSpliterator spliterator1 = baseSet.spliterator();
+		assertEquals(baseSet.size(), spliterator1.getExactSizeIfKnown());
+		final IntSpliterator spliterator2 = spliterator1.trySplit();
+		// No assurance of where we split, but where ever it is it should be a perfect split.
+		final java.util.stream.IntStream stream1 = java.util.stream.StreamSupport.intStream(spliterator1, false);
+		final java.util.stream.IntStream stream2 = java.util.stream.StreamSupport.intStream(spliterator2, false);
+
+		final IntOpenHashSet subSet1 = IntOpenHashSet.toSet(stream1);
+		// Intentionally collecting to a list for this second one.
+		final IntArrayList subSet2 = IntArrayList.toList(stream2);
+		assertEquals(baseSet.size(), subSet1.size() + subSet2.size());
+		final IntOpenHashSet recombinedSet = new IntOpenHashSet(baseSet.size());
+		recombinedSet.addAll(subSet1);
+		recombinedSet.addAll(subSet2);
+		assertEquals(baseSet, recombinedSet);
+	}
 
 	@SuppressWarnings("boxing")
 	private static void checkTable(final IntOpenHashSet s) {
@@ -317,7 +408,7 @@ public class IntOpenHashSetTest {
 		int maxProbes = 0;
 		final int[] key = m.key;
 		final double f = (double)m.size / m.n;
-		for (int i = 0, c = 0; i < m.n; i++) {
+		for (int i = 0, c = 0; i < m.n; i++)
 			if (key[i] != 0) c++;
 			else {
 				if (c != 0) {
@@ -330,7 +421,6 @@ public class IntOpenHashSetTest {
 				totProbes++;
 				totSquareProbes++;
 			}
-		}
 
 		final double expected = (double)totProbes / m.n;
 		System.err.println("Expected probes: " + (
@@ -360,8 +450,7 @@ public class IntOpenHashSetTest {
 
 		/* Now we check that m actually holds that data. */
 
-		for (final java.util.Iterator i = t.iterator(); i.hasNext();) {
-			final Object e = i.next();
+		for (final Object e : t) {
 			assertTrue("Error: m and t differ on a key (" + e + ") after insertion (iterating on t)", m.contains(e));
 		}
 
@@ -410,8 +499,7 @@ public class IntOpenHashSetTest {
 		assertTrue("Error: !t.equals(m) after removal", t.equals(m));
 		/* Now we check that m actually holds that data. */
 
-		for (final java.util.Iterator i = t.iterator(); i.hasNext();) {
-			final Object e = i.next();
+		for (final Object e : t) {
 			assertFalse("Error: m and t differ on a key (" + e + ") after removal (iterating on t)", !m.contains(e));
 		}
 
@@ -423,9 +511,14 @@ public class IntOpenHashSetTest {
 		}
 
 		/* Now we make m into an array, make it again a set and check it is OK. */
-		final int a[] = m.toIntArray();
+		int a[] = m.toIntArray();
 
 		assertTrue("Error: toArray() output (or array-based constructor) is not OK", new IntOpenHashSet(a).equals(m));
+
+		/* Same, but with streams */
+		a = m.intStream().toArray();
+
+		assertTrue("Error: intStream().toArray() output (or array-based constructor) is not OK", new IntOpenHashSet(a).equals(m));
 
 		/* Now we check cloning. */
 
@@ -540,5 +633,10 @@ public class IntOpenHashSetTest {
 		test(1000, Hash.DEFAULT_LOAD_FACTOR);
 		test(1000, Hash.FAST_LOAD_FACTOR);
 		test(1000, Hash.VERY_FAST_LOAD_FACTOR);
+	}
+
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(IntOpenHashSet.class, "test", /*num=*/"500", /*loadFactor=*/"0.75", /*seed=*/"3838474");
 	}
 }

@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil.objects;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +14,8 @@ package it.unimi.dsi.fastutil.objects;
  * limitations under the License.
  */
 
+package it.unimi.dsi.fastutil.objects;
+
 
 import static org.junit.Assert.assertEquals;
 
@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import it.unimi.dsi.fastutil.MainRunner;
 import it.unimi.dsi.fastutil.io.BinIO;
 
 public class ObjectHeapPriorityQueueTest {
@@ -43,6 +44,11 @@ public class ObjectHeapPriorityQueueTest {
 			assertEquals(q.first(), r.first());
 			assertEquals(q.dequeue(), r.dequeue());
 		}
+	}
+
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(ObjectHeapPriorityQueue.class, "test", /*num=*/"500", /*seed=*/"9329384");
 	}
 }
 

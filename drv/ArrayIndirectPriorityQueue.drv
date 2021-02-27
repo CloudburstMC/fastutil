@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2020 Paolo Boldi and Sebastiano Vigna
+ * Copyright (C) 2003-2021 Paolo Boldi and Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,9 @@ import java.util.Comparator;
 import it.unimi.dsi.fastutil.IndirectPriorityQueue;
 #endif
 
+#if ! KEY_CLASS_Integer
 import it.unimi.dsi.fastutil.ints.IntArrays;
+#endif
 
 import java.util.NoSuchElementException;
 
@@ -34,7 +36,7 @@ import java.util.NoSuchElementException;
  * directly on the array. The array is enlarged as needed, but it is never
  * shrunk. Use the {@link #trim()} method to reduce its size, if necessary.
  *
- * <p>This implementation is extremely inefficient, but it is difficult to beat
+ * @implSpec This implementation is extremely inefficient, but it is difficult to beat
  * when the size of the queue is very small. Moreover, it allows to enqueue several
  * time the same index, without limitations.
  */
@@ -427,8 +429,7 @@ public class ARRAY_INDIRECT_PRIORITY_QUEUE KEY_GENERIC implements INDIRECT_PRIOR
 
 
 	private static void fatal(String msg) {
-		System.out.println(msg);
-		System.exit(1);
+		throw new AssertionError(msg);
 	}
 
 	private static void ensure(boolean cond, String msg) {
@@ -645,7 +646,7 @@ public class ARRAY_INDIRECT_PRIORITY_QUEUE KEY_GENERIC implements INDIRECT_PRIOR
 
 
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws Exception {
 		int n  = Integer.parseInt(args[1]);
 		if (args.length > 2) r = new java.util.Random(seed = Long.parseLong(args[2]));
 
@@ -656,6 +657,7 @@ public class ARRAY_INDIRECT_PRIORITY_QUEUE KEY_GENERIC implements INDIRECT_PRIOR
 		} catch(Throwable e) {
 			e.printStackTrace(System.err);
 			System.err.println("seed: " + seed);
+			throw e;
 		}
 	}
 

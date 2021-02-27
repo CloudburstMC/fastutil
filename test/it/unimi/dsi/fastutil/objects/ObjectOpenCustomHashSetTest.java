@@ -1,5 +1,3 @@
-package it.unimi.dsi.fastutil.objects;
-
 /*
  * Copyright (C) 2017 Sebastiano Vigna
  *
@@ -16,6 +14,8 @@ package it.unimi.dsi.fastutil.objects;
  * limitations under the License.
  */
 
+package it.unimi.dsi.fastutil.objects;
+
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -25,6 +25,7 @@ import java.util.Random;
 import org.junit.Test;
 
 import it.unimi.dsi.fastutil.Hash;
+import it.unimi.dsi.fastutil.MainRunner;
 import it.unimi.dsi.fastutil.bytes.ByteArrays;
 
 public class ObjectOpenCustomHashSetTest {
@@ -61,4 +62,8 @@ public class ObjectOpenCustomHashSetTest {
 		}
 	}
 
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(ObjectOpenCustomHashSet.class, "test", /*num=*/"500", /*loadFactor=*/"0.75", /*seed=*/"3834745");
+	}
 }

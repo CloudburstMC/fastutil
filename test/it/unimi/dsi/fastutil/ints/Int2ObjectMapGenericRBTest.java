@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil.ints;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +14,25 @@ package it.unimi.dsi.fastutil.ints;
  * limitations under the License.
  */
 
+package it.unimi.dsi.fastutil.ints;
+
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.function.Supplier;
 
+import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+
+import it.unimi.dsi.fastutil.MainRunner;
 
 public class Int2ObjectMapGenericRBTest extends Int2ObjectMapGenericTest<Int2ObjectRBTreeMap<Integer>> {
 	@Parameters
 	public static Iterable<Object[]> data() {
 		return Collections.singletonList(new Object[] {(Supplier<Int2ObjectRBTreeMap<Integer>>) Int2ObjectRBTreeMap::new, EnumSet.allOf(Capability.class)});
+	}
+	
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(Int2ObjectRBTreeMap.class, "test", /*num=*/"20", /*seed=*/"42342");
 	}
 }

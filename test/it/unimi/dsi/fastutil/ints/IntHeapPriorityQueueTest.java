@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil.ints;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +14,8 @@ package it.unimi.dsi.fastutil.ints;
  * limitations under the License.
  */
 
+package it.unimi.dsi.fastutil.ints;
+
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import it.unimi.dsi.fastutil.MainRunner;
 import it.unimi.dsi.fastutil.io.BinIO;
 
 public class IntHeapPriorityQueueTest {
@@ -41,6 +42,11 @@ public class IntHeapPriorityQueueTest {
 			assertEquals(q.first(), r.first());
 			assertEquals(q.dequeue(), r.dequeue());
 		}
+	}
+	
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(IntHeapPriorityQueue.class, "test", /*num=*/"500", /*seed=*/"9329384");
 	}
 }
 

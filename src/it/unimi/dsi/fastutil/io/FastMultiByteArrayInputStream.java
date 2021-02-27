@@ -1,5 +1,3 @@
-package it.unimi.dsi.fastutil.io;
-
 /*
  * Copyright (C) 2005-2020 Sebastiano Vigna
  *
@@ -15,6 +13,8 @@ package it.unimi.dsi.fastutil.io;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package it.unimi.dsi.fastutil.io;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -76,14 +76,28 @@ public class FastMultiByteArrayInputStream extends MeasurableInputStream impleme
 		for(int i = 0; i < array.length - 1; i++) {
 			array[i] = new byte[size >= SLICE_SIZE ? SLICE_SIZE : (int)size];
 			// It is important *not* to use is.read() directly because of bug #6478546
-			if (BinIO.loadBytes(is, array[i]) != array[i].length) throw new EOFException();
+			if (read(is, array[i]) != array[i].length) throw new EOFException();
 			size -= array[i].length;
 		}
 
 		current = array[0];
 	}
 
-	/** Creates a new multi-array input stream sharing the backing arrays of another multi-array input stream.
+  private static long read(final InputStream is, final byte[] a) throws IOException {
+    if (a.length == 0) return 0L;
+
+    int read = 0, result;
+    do {
+      result = is.read(a, read, Math.min(a.length - read, 1024 * 1024));
+      if (result < 0) return read;
+      read += result;
+    } while(read < a.length);
+
+    return read;
+  }
+
+
+  /** Creates a new multi-array input stream sharing the backing arrays of another multi-array input stream.
 	 *
 	 * @param is the multi-array input stream to replicate.
 	 */

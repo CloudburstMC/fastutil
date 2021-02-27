@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil;
-
 /*
- * Copyright (C) 2002-2020 Sebastiano Vigna
+ * Copyright (C) 2002-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +14,14 @@ package it.unimi.dsi.fastutil;
  * limitations under the License.
  */
 
-import it.unimi.dsi.fastutil.ints.IntComparator;
+package it.unimi.dsi.fastutil;
 
 import java.util.ArrayList;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
+
+import it.unimi.dsi.fastutil.ints.IntComparator;
 
 /** A class providing static methods and objects that do useful things with arrays.
  *
@@ -29,6 +30,12 @@ import java.util.concurrent.RecursiveAction;
  * a stable, in-place {@linkplain #mergeSort(int, int, IntComparator, Swapper) mergesort}. These
  * generic sorting methods can be used to sort any kind of list, but they find their natural
  * usage, for instance, in sorting arrays in parallel.
+ *
+ * <p>Some algorithms provide a parallel version that will by default use the
+ * {@linkplain ForkJoinPool#commonPool() common pool}, but this can be overridden by calling the
+ * function in a task already in the {@link ForkJoinPool} that the operation should run in. For example,
+ * something along the lines of "{@code poolToParallelSortIn.invoke(() -> parallelQuickSort(arrayToSort))}"
+ * will run the parallel sort in {@code poolToParallelSortIn} instead of the default pool.
  *
  * @see Arrays
  */
@@ -41,33 +48,52 @@ public class Arrays {
 	 *  throwing {@link OutOfMemoryError} on some JVMs. We adopt the same value. */
 	public static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
-	/** Ensures that a range given by its first (inclusive) and last (exclusive) elements fits an array of given length.
+	/**
+	 * Ensures that a range given by its first (inclusive) and last (exclusive) elements fits an
+	 * array of given length.
 	 *
-	 * <p>This method may be used whenever an array range check is needed.
+	 * <p>
+	 * This method may be used whenever an array range check is needed.
+	 *
+	 * <p>
+	 * In Java 9 and up, this method should be considered deprecated in favor of the
+	 * {@link java.util.Objects#checkFromToIndex(int, int, int)} method, which may be intrinsified
+	 * in recent JVMs.
 	 *
 	 * @param arrayLength an array length.
 	 * @param from a start index (inclusive).
 	 * @param to an end index (inclusive).
 	 * @throws IllegalArgumentException if {@code from} is greater than {@code to}.
-	 * @throws ArrayIndexOutOfBoundsException if {@code from} or {@code to} are greater than {@code arrayLength} or negative.
+	 * @throws ArrayIndexOutOfBoundsException if {@code from} or {@code to} are greater than
+	 *             {@code arrayLength} or negative.
 	 */
 	public static void ensureFromTo(final int arrayLength, final int from, final int to) {
+		// When Java 9 becomes the minimum, use Objects#checkFromToIndex​​, as that can be an intrinsic
 		if (from < 0) throw new ArrayIndexOutOfBoundsException("Start index (" + from + ") is negative");
 		if (from > to) throw new IllegalArgumentException("Start index (" + from + ") is greater than end index (" + to + ")");
 		if (to > arrayLength) throw new ArrayIndexOutOfBoundsException("End index (" + to + ") is greater than array length (" + arrayLength + ")");
 	}
 
-	/** Ensures that a range given by an offset and a length fits an array of given length.
+	/**
+	 * Ensures that a range given by an offset and a length fits an array of given length.
 	 *
-	 * <p>This method may be used whenever an array range check is needed.
+	 * <p>
+	 * This method may be used whenever an array range check is needed.
+	 *
+	 * <p>
+	 * In Java 9 and up, this method should be considered deprecated in favor of the
+	 * {@link java.util.Objects#checkFromIndexSize(int, int, int)} method, which may be intrinsified
+	 * in recent JVMs.
 	 *
 	 * @param arrayLength an array length.
 	 * @param offset a start index for the fragment
 	 * @param length a length (the number of elements in the fragment).
 	 * @throws IllegalArgumentException if {@code length} is negative.
-	 * @throws ArrayIndexOutOfBoundsException if {@code offset} is negative or {@code offset}+{@code length} is greater than {@code arrayLength}.
+	 * @throws ArrayIndexOutOfBoundsException if {@code offset} is negative or
+	 *             {@code offset}+{@code length} is greater than {@code arrayLength}.
 	 */
 	public static void ensureOffsetLength(final int arrayLength, final int offset, final int length) {
+		// When Java 9 becomes the minimum, use Objects#checkFromIndexSize​, as that can be an intrinsic
 		if (offset < 0) throw new ArrayIndexOutOfBoundsException("Offset (" + offset + ") is negative");
 		if (length < 0) throw new IllegalArgumentException("Length (" + length + ") is negative");
 		if (offset + length > arrayLength) throw new ArrayIndexOutOfBoundsException("Last index (" + (offset + length) + ") is greater than array length (" + arrayLength + ")");
@@ -98,9 +124,9 @@ public class Arrays {
 			firstCut = upperBound(from, mid, secondCut, comp);
 		}
 
-		int first2 = firstCut;
-		int middle2 = mid;
-		int last2 = secondCut;
+		final int first2 = firstCut;
+		final int middle2 = mid;
+		final int last2 = secondCut;
 		if (middle2 != first2 && middle2 != last2) {
 			int first1 = first2;
 			int last1 = middle2;
@@ -137,8 +163,8 @@ public class Arrays {
 		// if (comp==null) throw new NullPointerException();
 		int len = to - from;
 		while (len > 0) {
-			int half = len / 2;
-			int middle = from + half;
+			final int half = len / 2;
+			final int middle = from + half;
 			if (comp.compare(middle, pos) < 0) {
 				from = middle + 1;
 				len -= half + 1;
@@ -167,8 +193,8 @@ public class Arrays {
 		// if (comp==null) throw new NullPointerException();
 		int len = mid - from;
 		while (len > 0) {
-			int half = len / 2;
-			int middle = from + half;
+			final int half = len / 2;
+			final int middle = from + half;
 			if (comp.compare(pos, middle) < 0) {
 				len = half;
 			}
@@ -184,15 +210,21 @@ public class Arrays {
 	 * Returns the index of the median of the three indexed chars.
 	 */
 	private static int med3(final int a, final int b, final int c, final IntComparator comp) {
-		int ab = comp.compare(a, b);
-		int ac = comp.compare(a, c);
-		int bc = comp.compare(b, c);
+		final int ab = comp.compare(a, b);
+		final int ac = comp.compare(a, c);
+		final int bc = comp.compare(b, c);
 		return (ab < 0 ?
 				(bc < 0 ? b : ac < 0 ? c : a) :
 				(bc > 0 ? b : ac > 0 ? c : a));
 	}
 
 	 private static final int MERGESORT_NO_REC = 16;
+
+	private static ForkJoinPool getPool() {
+		// Make sure to update Arrays.drv, BigArrays.drv, and src/it/unimi/dsi/fastutil/Arrays.java as well
+		final ForkJoinPool current = ForkJoinTask.getPool();
+		return current == null ? ForkJoinPool.commonPool() : current;
+	}
 
 	 /** Sorts the specified range of elements using the specified swapper and according to the order induced by the specified
 	 * comparator using mergesort.
@@ -228,7 +260,7 @@ public class Arrays {
 		}
 
 		// Recursively sort halves
-		int mid = (from + to) >>> 1;
+		final int mid = (from + to) >>> 1;
 		mergeSort(from, mid, c, swapper);
 		mergeSort(mid, to, c, swapper);
 
@@ -337,8 +369,6 @@ public class Arrays {
 	 * McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11), pages
 	 * 1249&minus;1265, 1993.
 	 *
-	 * <p>This implementation uses a {@link ForkJoinPool} executor service with {@link Runtime#availableProcessors()} parallel threads.
-	 *
 	 * @param from the index of the first element (inclusive) to be sorted.
 	 * @param to the index of the last element (exclusive) to be sorted.
 	 * @param comp the comparator to determine the order of the generic data.
@@ -346,9 +376,11 @@ public class Arrays {
 	 *
 	 */
 	public static void parallelQuickSort(final int from, final int to, final IntComparator comp, final Swapper swapper) {
-		final ForkJoinPool pool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
-		pool.invoke(new ForkJoinGenericQuickSort(from, to, comp, swapper));
-		pool.shutdown();
+		final ForkJoinPool pool = getPool();
+		if (to - from < PARALLEL_QUICKSORT_NO_FORK || pool.getParallelism() == 1) quickSort(from, to, comp, swapper);
+		else {
+			pool.invoke(new ForkJoinGenericQuickSort(from, to, comp, swapper));
+		}
 	}
 
 
@@ -358,8 +390,6 @@ public class Arrays {
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas
 	 * McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11), pages
 	 * 1249&minus;1265, 1993.
-	 *
-	 * <p>This implementation uses a {@link ForkJoinPool} executor service with {@link Runtime#availableProcessors()} parallel threads.
 	 *
 	 * @param from the index of the first element (inclusive) to be sorted.
 	 * @param to the index of the last element (exclusive) to be sorted.
@@ -383,7 +413,7 @@ public class Arrays {
 		int l = from;
 		int n = to - 1;
 		if (len > QUICKSORT_MEDIAN_OF_9) { // Big arrays, pseudomedian of 9
-			int s = len / 8;
+			final int s = len / 8;
 			l = med3(l, l + s, l + 2 * s, comp);
 			m = med3(m - s, m, m + s, comp);
 			n = med3(n - 2 * s, n - s, n, comp);

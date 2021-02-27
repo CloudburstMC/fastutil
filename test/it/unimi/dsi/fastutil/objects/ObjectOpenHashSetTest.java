@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil.objects;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +14,8 @@ package it.unimi.dsi.fastutil.objects;
  * limitations under the License.
  */
 
+package it.unimi.dsi.fastutil.objects;
+
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -27,6 +27,9 @@ import org.junit.Test;
 
 import it.unimi.dsi.fastutil.Hash;
 
+import it.unimi.dsi.fastutil.MainRunner;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+
 @SuppressWarnings("rawtypes")
 public class ObjectOpenHashSetTest {
 
@@ -35,7 +38,7 @@ public class ObjectOpenHashSetTest {
 	@SuppressWarnings("boxing")
 	public void testStrangeRetainAllCase() {
 
-		ObjectArrayList<Integer> initialElements = ObjectArrayList.wrap(new Integer[] { 586, 940,
+		final ObjectArrayList<Integer> initialElements = ObjectArrayList.wrap(new Integer[] { 586, 940,
 				1086, 1110, 1168, 1184, 1185, 1191, 1196, 1229, 1237, 1241,
 				1277, 1282, 1284, 1299, 1308, 1309, 1310, 1314, 1328, 1360,
 				1366, 1370, 1378, 1388, 1392, 1402, 1406, 1411, 1426, 1437,
@@ -57,11 +60,11 @@ public class ObjectOpenHashSetTest {
 				7094, 7379, 7384, 7388, 7394, 7414, 7419, 7458, 7459, 7466,
 				7467 });
 
-		ObjectArrayList<Integer> retainElements = ObjectArrayList.wrap(new Integer[] { 586 });
+		final ObjectArrayList<Integer> retainElements = ObjectArrayList.wrap(new Integer[] { 586 });
 
 		// Initialize both implementations with the same data
-		ObjectOpenHashSet<Integer> instance = new ObjectOpenHashSet<>(initialElements);
-		ObjectRBTreeSet<Integer> referenceInstance = new ObjectRBTreeSet<>(initialElements);
+		final ObjectOpenHashSet<Integer> instance = new ObjectOpenHashSet<>(initialElements);
+		final ObjectRBTreeSet<Integer> referenceInstance = new ObjectRBTreeSet<>(initialElements);
 
 		instance.retainAll(retainElements);
 		referenceInstance.retainAll(retainElements);
@@ -76,13 +79,78 @@ public class ObjectOpenHashSetTest {
 		assertEquals(referenceInstance, instance);
 	}
 
+	@Test
+	public void testOf() {
+		final ObjectOpenHashSet<Long> s = ObjectOpenHashSet.of(Long.valueOf(0l), Long.valueOf(1l), Long.valueOf(2l), Long.valueOf(3l));
+		assertEquals(new LongOpenHashSet(new long[] { 0, 1, 2, 3 }), s);
+	}
+
+	@Test
+	public void testOfEmpty() {
+		final ObjectOpenHashSet<Long> s = ObjectOpenHashSet.of();
+		assertTrue(s.isEmpty());
+	}
+
+	@Test
+	public void testOfSingleton() {
+		final ObjectOpenHashSet<Long> s = ObjectOpenHashSet.of(Long.valueOf(0l));
+		assertEquals(new LongOpenHashSet(new long[] { 0 }), s);
+	}
+
+	@Test
+	public void testOfPair() {
+		final ObjectOpenHashSet<Long> s = ObjectOpenHashSet.of(Long.valueOf(0l), Long.valueOf(1l));
+		assertEquals(new LongOpenHashSet(new long[] { 0, 1 }), s);
+	}
+
+	@Test
+	public void testOfTriplet() {
+		final ObjectOpenHashSet<Long> s = ObjectOpenHashSet.of(Long.valueOf(0l), Long.valueOf(1l), Long.valueOf(2l));
+		assertEquals(new LongOpenHashSet(new long[] { 0, 1, 2 }), s);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testOfDuplicateThrows() {
+		ObjectOpenHashSet.of(Long.valueOf(0), Long.valueOf(0));
+	}
+
+	@Test
+	public void testToSet() {
+		final ObjectOpenHashSet<String> baseSet = ObjectOpenHashSet.of("wood", "board", "glass", "metal");
+		ObjectOpenHashSet<String> transformed = baseSet.stream().map(s -> "ply" + s).collect(ObjectOpenHashSet.toSet());
+		assertEquals(ObjectOpenHashSet.of("plywood", "plyboard", "plyglass", "plymetal"), transformed);
+	}
+
+	@Test
+	public void testSpliteratorTrySplit() {
+		final ObjectOpenHashSet<String> baseSet = ObjectOpenHashSet
+				.of("0", "1", "2", "3", "4", "5", "bird");
+		ObjectSpliterator<String> spliterator1 = baseSet.spliterator();
+		assertEquals(baseSet.size(), spliterator1.getExactSizeIfKnown());
+		ObjectSpliterator<String> spliterator2 = spliterator1.trySplit();
+		// No assurance of where we split, but where ever it is it should be a perfect split.
+		java.util.stream.Stream<String> stream1 = java.util.stream.StreamSupport
+				.stream(spliterator1, false);
+		java.util.stream.Stream<String> stream2 = java.util.stream.StreamSupport
+				.stream(spliterator2, false);
+
+		final ObjectOpenHashSet<String> subSet1 = stream1.collect(ObjectOpenHashSet.toSet());
+		// Intentionally collecting to a list for this second one.
+		final ObjectArrayList<String> subSet2 = stream2.collect(ObjectArrayList.toList());
+		assertEquals(baseSet.size(), subSet1.size() + subSet2.size());
+		final ObjectOpenHashSet<String> recombinedSet = new ObjectOpenHashSet<>(baseSet.size());
+		recombinedSet.addAll(subSet1);
+		recombinedSet.addAll(subSet2);
+		assertEquals(baseSet, recombinedSet);
+	}
+
 	private static java.util.Random r = new java.util.Random(0);
 
 	private static Object genKey() {
 		return Integer.toBinaryString(r.nextInt());
 	}
 
-	private static void checkTable(ObjectOpenHashSet<Integer> s) {
+	private static void checkTable(final ObjectOpenHashSet<Integer> s) {
 		final Object[] key = s.key;
 		assert (s.n & -s.n) == s.n : "Table length is not a power of two: " + s.n;
 		assert s.n == key.length - 1;
@@ -94,13 +162,13 @@ public class ObjectOpenHashSetTest {
 		if (s.containsNull && ! s.contains(null)) throw new AssertionError("Hash table should contain null by internal state, but it doesn't when queried");
 		if (! s.containsNull && s.contains(null)) throw new AssertionError("Hash table should not contain null by internal state, but it does when queried");
 
-		java.util.HashSet<String> t = new java.util.HashSet<>();
+		final java.util.HashSet<String> t = new java.util.HashSet<>();
 		for (int i = s.size(); i-- != 0;)
 			if (key[i] != null && !t.add((String)key[i])) throw new AssertionError("Key " + key[i] + " appears twice");
 
 	}
 
-	private static void printProbes(ObjectOpenHashSet m) {
+	private static void printProbes(final ObjectOpenHashSet m) {
 		long totProbes = 0;
 		double totSquareProbes = 0;
 		int maxProbes = 0;
@@ -129,10 +197,10 @@ public class ObjectOpenHashSetTest {
 
 
 	@SuppressWarnings("unchecked")
-	private static void test(int n, float f) {
+	private static void test(final int n, final float f) {
 		int c;
 		ObjectOpenHashSet m = new ObjectOpenHashSet(Hash.DEFAULT_INITIAL_SIZE, f);
-		java.util.Set t = new java.util.HashSet();
+		final java.util.Set t = new java.util.HashSet();
 		/* First of all, we fill t with random data. */
 		for (int i = 0; i < f * n; i++)
 			t.add((genKey()));
@@ -143,14 +211,13 @@ public class ObjectOpenHashSetTest {
 		printProbes(m);
 		checkTable(m);
 		/* Now we check that m actually holds that data. */
-		for (java.util.Iterator i = t.iterator(); i.hasNext();) {
-			Object e = i.next();
+		for (final Object e : t) {
 			assertTrue("Error: m and t differ on a key (" + e + ") after insertion (iterating on t)", m.contains(e));
 		}
 		/* Now we check that m actually holds that data, but iterating on m. */
 		c = 0;
-		for (java.util.Iterator i = m.iterator(); i.hasNext();) {
-			Object e = i.next();
+		for (final java.util.Iterator i = m.iterator(); i.hasNext();) {
+			final Object e = i.next();
 			c++;
 			assertTrue("Error: m and t differ on a key (" + e + ") after insertion (iterating on m)", t.contains(e));
 		}
@@ -160,7 +227,7 @@ public class ObjectOpenHashSetTest {
 		 * use the polymorphic method.
 		 */
 		for (int i = 0; i < n; i++) {
-			Object T = genKey();
+			final Object T = genKey();
 			assertTrue("Error: divergence in keys between t and m (polymorphic method)", m.contains(T) == t.contains((T)));
 		}
 		/*
@@ -168,15 +235,15 @@ public class ObjectOpenHashSetTest {
 		 * m we use the standard method.
 		 */
 		for (int i = 0; i < n; i++) {
-			Object T = genKey();
+			final Object T = genKey();
 			assertTrue("Error: divergence between t and m (standard method)", m.contains((T)) == t.contains((T)));
 		}
 		/*
 		 * Check that addOrGet does indeed return the original instance, not a copy
 		 */
-		for (java.util.Iterator i = m.iterator(); i.hasNext();) {
-			Object e = i.next();
-			Object e2 = m.addOrGet(new StringBuilder((String)e).toString()); // Make a new object!
+		for (final java.util.Iterator i = m.iterator(); i.hasNext();) {
+			final Object e = i.next();
+			final Object e2 = m.addOrGet(new StringBuilder((String)e).toString()); // Make a new object!
 			assertTrue("addOrGet does not return the same object", e == e2);
 		}
 		/* This should not have modified the table */
@@ -199,36 +266,38 @@ public class ObjectOpenHashSetTest {
 		/*
 		 * Now we check that m actually holds that data.
 		 */
-		for (java.util.Iterator i = t.iterator(); i.hasNext();) {
-			Object e = i.next();
+		for (final Object e : t) {
 			assertTrue("Error: m and t differ on a key (" + e + ") after removal (iterating on t)", m.contains(e));
 		}
 		/* Now we check that m actually holds that data, but iterating on m. */
-		for (java.util.Iterator i = m.iterator(); i.hasNext();) {
-			Object e = i.next();
+		for (final java.util.Iterator i = m.iterator(); i.hasNext();) {
+			final Object e = i.next();
 			assertTrue("Error: m and t differ on a key (" + e + ") after removal (iterating on m)", t.contains(e));
 		}
 		/* Now we make m into an array, make it again a set and check it is OK. */
 		Object a[] = m.toArray();
 		assertTrue("Error: toArray() output (or array-based constructor) is not OK", new ObjectOpenHashSet(a).equals(m));
+		/* As above, but using streams */
+		a = m.stream().toArray();
+		assertTrue("Error: stream().toArray() output (or array-based constructor) is not OK", new ObjectOpenHashSet(a).equals(m));
 		/* Now we check cloning. */
 		assertTrue("Error: m does not equal m.clone()", m.equals(m.clone()));
 		assertTrue("Error: m.clone() does not equal m", m.clone().equals(m));
-		int h = m.hashCode();
+		final int h = m.hashCode();
 		/* Now we save and read m. */
 		try {
-			java.io.File ff = new java.io.File("it.unimi.dsi.fastutil.test.junit." + m.getClass().getSimpleName() + "." + n);
-			java.io.OutputStream os = new java.io.FileOutputStream(ff);
-			java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(os);
+			final java.io.File ff = new java.io.File("it.unimi.dsi.fastutil.test.junit." + m.getClass().getSimpleName() + "." + n);
+			final java.io.OutputStream os = new java.io.FileOutputStream(ff);
+			final java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(os);
 			oos.writeObject(m);
 			oos.close();
-			java.io.InputStream is = new java.io.FileInputStream(ff);
-			java.io.ObjectInputStream ois = new java.io.ObjectInputStream(is);
+			final java.io.InputStream is = new java.io.FileInputStream(ff);
+			final java.io.ObjectInputStream ois = new java.io.ObjectInputStream(is);
 			m = (ObjectOpenHashSet)ois.readObject();
 			ois.close();
 			ff.delete();
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -236,8 +305,8 @@ public class ObjectOpenHashSetTest {
 		checkTable(m);
 		printProbes(m);
 		/* Now we check that m actually holds that data, but iterating on m. */
-		for (java.util.Iterator i = m.iterator(); i.hasNext();) {
-			Object e = i.next();
+		for (final java.util.Iterator i = m.iterator(); i.hasNext();) {
+			final Object e = i.next();
 			assertTrue("Error: m and t differ on a key (" + e + ") after save/read", t.contains(e));
 		}
 		/* Now we put and remove random data in m and t, checking that the result is the same. */
@@ -252,7 +321,7 @@ public class ObjectOpenHashSetTest {
 		/*
 		 * Now we take out of m everything , and check that it is empty.
 		 */
-		for (java.util.Iterator i = m.iterator(); i.hasNext();) {
+		for (final java.util.Iterator i = m.iterator(); i.hasNext();) {
 			i.next();
 			i.remove();
 		}
@@ -292,9 +361,14 @@ public class ObjectOpenHashSetTest {
 	@Test
 	public void testGet() {
 		final ObjectOpenHashSet<String> s = new ObjectOpenHashSet<>();
-		String a = "a";
+		final String a = "a";
 		assertTrue(s.add(a));
 		assertSame(a, s.get("a"));
 		assertNull(s.get("b"));
+	}
+
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(ObjectOpenHashSet.class, "test", /*num=*/"500", /*loadFactor=*/"0.75", /*seed=*/"3838474");
 	}
 }

@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +12,17 @@ package it.unimi.dsi.fastutil;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ */
+
+package it.unimi.dsi.fastutil;
+
+/**
+ * Static utility method for safe conversions between primitive types.
+ *
+ * <P>
+ * Note that the methods of this class will throw an exception whenever a larger type cannot be
+ * exactly represented by a smaller type. This includes doubles within the range a float, but with
+ * too many significant bits.
  */
 
 public final class SafeMath {
@@ -34,6 +43,21 @@ public final class SafeMath {
 		return (short) value;
 	}
 
+	public static char safeLongToChar(final long value) {
+		if (value < Character.MIN_VALUE || Character.MAX_VALUE < value ) throw new IllegalArgumentException(value + " can't be represented as int (out of range)");
+		return (char) value;
+	}
+
+	public static byte safeLongToByte(final long value) {
+		if (value < Byte.MIN_VALUE || Byte.MAX_VALUE < value ) throw new IllegalArgumentException(value + " can't be represented as int (out of range)");
+		return (byte) value;
+	}
+
+	public static short safeLongToShort(final long value) {
+		if (value < Short.MIN_VALUE || Short.MAX_VALUE < value ) throw new IllegalArgumentException(value + " can't be represented as int (out of range)");
+		return (short) value;
+	}
+
 	public static int safeLongToInt(final long value) {
 		if (value < Integer.MIN_VALUE || Integer.MAX_VALUE < value ) throw new IllegalArgumentException(value + " can't be represented as int (out of range)");
 		return (int) value;
@@ -42,7 +66,7 @@ public final class SafeMath {
 	public static float safeDoubleToFloat(final double value) {
 		if (Double.isNaN(value)) return Float.NaN;
 		if (Double.isInfinite(value)) return value < 0.0d ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY;
-		if (value < Float.MIN_VALUE || Float.MAX_VALUE < value) throw new IllegalArgumentException(value + " can't be represented as float (out of range)");
+		if (value < -Float.MAX_VALUE || Float.MAX_VALUE < value) throw new IllegalArgumentException(value + " can't be represented as float (out of range)");
 		final float floatValue = (float) value;
 		if (floatValue != value) throw new IllegalArgumentException(value + " can't be represented as float (imprecise)");
 		return floatValue;

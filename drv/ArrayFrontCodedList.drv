@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2020 Sebastiano Vigna
+ * Copyright (C) 2002-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,9 @@ import static it.unimi.dsi.fastutil.BigArrays.trim;
 import it.unimi.dsi.fastutil.BigArrays;
 import it.unimi.dsi.fastutil.objects.AbstractObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
+#if ! KEY_CLASS_Long
 import it.unimi.dsi.fastutil.longs.LongArrays;
+#endif
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -36,7 +38,7 @@ import java.util.RandomAccess;
 
 /** Compact storage of lists of arrays using front coding.
  *
- * <p>This class stores immutably a list of arrays in a single large array
+ * <p>This class stores immutably a list of arrays in a single {@linkplain it.unimi.dsi.fastutil.BigArrays big array}
  * using front coding (of course, the compression will be reasonable only if
  * the list is sorted lexicographically&mdash;see below). It implements an
  * immutable type-specific list that returns the <var>i</var>-th array when
@@ -177,7 +179,7 @@ public class ARRAY_FRONT_CODED_LIST extends AbstractObjectList<KEY_TYPE[]> imple
 	 * @param pos the starting position.
 	 * @return the length coded at {@code pos}.
 	 */
-	private static int readInt(final KEY_TYPE a[][], long pos) {
+	static int readInt(final KEY_TYPE a[][], long pos) {
 #if KEY_CLASS_Integer
 		return BigArrays.get(a, pos);
 #elif KEY_CLASS_Long
@@ -205,7 +207,7 @@ public class ARRAY_FRONT_CODED_LIST extends AbstractObjectList<KEY_TYPE[]> imple
 	 * @param length the length to be coded.
 	 * @return the number of elements coding {@code length}.
 	 */
-	private static int count(final int length) {
+	static int count(final int length) {
 #if KEY_CLASS_Integer || KEY_CLASS_Long
 		return 1;
 #elif KEY_CLASS_Character || KEY_CLASS_Short
@@ -225,7 +227,7 @@ public class ARRAY_FRONT_CODED_LIST extends AbstractObjectList<KEY_TYPE[]> imple
 	 * @param pos the starting position.
 	 * @return the number of elements coding {@code length}.
 	 */
-	private static int writeInt(final KEY_TYPE a[][], int length, long pos) {
+	static int writeInt(final KEY_TYPE a[][], int length, long pos) {
 #if KEY_CLASS_Long
 		BigArrays.set(a, pos, length);
 		return 1;
@@ -280,6 +282,7 @@ public class ARRAY_FRONT_CODED_LIST extends AbstractObjectList<KEY_TYPE[]> imple
 	 *
 	 * <p>This private version of {@link #arrayLength(int)} does not check its argument.
 	 *
+	 * @param array the data array.
 	 * @param index an index.
 	 * @return the length of the {@code index}-th array.
 	 */
@@ -361,7 +364,7 @@ public class ARRAY_FRONT_CODED_LIST extends AbstractObjectList<KEY_TYPE[]> imple
 	}
 
 	/** {@inheritDoc}
-	 * <p>This implementation delegates to {@link #getArray(int)}. */
+	 * @implSpec This implementation delegates to {@link #getArray(int)}. */
 	@Override
 	public KEY_TYPE[] get(final int index) {
 		return getArray(index);
@@ -551,180 +554,4 @@ public class ARRAY_FRONT_CODED_LIST extends AbstractObjectList<KEY_TYPE[]> imple
 		// Rebuild pointer array
 		p = rebuildPointerArray();
 	}
-
-
-#ifdef TEST
-
-	private static long seed = System.currentTimeMillis();
-	private static java.util.Random r = new java.util.Random(seed);
-
-	private static KEY_TYPE genKey() {
-#if KEY_CLASS_Byte || KEY_CLASS_Short || KEY_CLASS_Character
-		return (KEY_TYPE)(r.nextInt());
-#elif KEYS_PRIMITIVE
-		return r.NEXT_KEY();
-#elif KEY_CLASS_Object
-		return Integer.toBinaryString(r.nextInt());
-#else
-		return new java.io.Serializable() {};
-#endif
-	}
-
-
-	private static java.text.NumberFormat format = new java.text.DecimalFormat("#,###.00");
-	private static java.text.FieldPosition fp = new java.text.FieldPosition(0);
-
-	private static String format(double d) {
-		StringBuffer s = new StringBuffer();
-		return format.format(d, s, fp).toString();
-	}
-
-	private static void speedTest(int n, boolean comp) {
-		System.out.println("There are presently no speed tests for this class.");
-	}
-
-
-	private static void fatal(String msg) {
-		System.out.println(msg);
-		System.exit(1);
-	}
-
-	private static void ensure(boolean cond, String msg) {
-		if (cond) return;
-		fatal(msg);
-	}
-
-	private static boolean contentEquals(java.util.List x, java.util.List y) {
-		if (x.size() != y.size()) return false;
-		for(int i = 0; i < x.size(); i++) if (! java.util.Arrays.equals((KEY_TYPE[])x.get(i), (KEY_TYPE[])y.get(i))) return false;
-		return true;
-	}
-
-	private static int l[];
-	private static KEY_TYPE[][] a;
-
-
-	private static void runTest(int n) {
-		int c;
-
-		l = new int[n];
-		a = new KEY_TYPE[n][];
-
-		for(int i = 0; i < n; i++) l[i] = (int)(Math.abs(r.nextGaussian())*32);
-		for(int i = 0; i < n; i++) a[i] = new KEY_TYPE[l[i]];
-		for(int i = 0; i < n; i++) for(int j = 0; j < l[i]; j++) a[i][j] = genKey();
-
-		ARRAY_FRONT_CODED_LIST m = new ARRAY_FRONT_CODED_LIST(it.unimi.dsi.fastutil.objects.ObjectIterators.wrap(a), r.nextInt(4) + 1);
-		it.unimi.dsi.fastutil.objects.ObjectArrayList t = new it.unimi.dsi.fastutil.objects.ObjectArrayList(a);
-
-		//System.out.println(m);
-		//for(i = 0; i < t.size(); i++) System.out.println(ARRAY_LIST.wrap((KEY_TYPE[])t.get(i)));
-
-		/* Now we check that m actually holds that data. */
-
-		ensure(contentEquals(m, t), "Error (" + seed + "): m does not equal t at creation");
-
-		/* Now we check cloning. */
-
-		ensure(contentEquals(m, (java.util.List)m.clone()), "Error (" + seed + "): m does not equal m.clone()");
-
-		/* Now we play with iterators. */
-
-		{
-			ObjectListIterator i;
-			java.util.ListIterator j;
-			Object J;
-			i = m.listIterator();
-			j = t.listIterator();
-
-			for(int k = 0; k < 2*n; k++) {
-				ensure(i.hasNext() == j.hasNext(), "Error (" + seed + "): divergence in hasNext()");
-				ensure(i.hasPrevious() == j.hasPrevious(), "Error (" + seed + "): divergence in hasPrevious()");
-
-				if (r.nextFloat() < .8 && i.hasNext()) {
-					ensure(java.util.Arrays.equals((KEY_TYPE[])i.next(), (KEY_TYPE[])j.next()), "Error (" + seed + "): divergence in next()");
-
-				}
-				else if (r.nextFloat() < .2 && i.hasPrevious()) {
-					ensure(java.util.Arrays.equals((KEY_TYPE[])i.previous(), (KEY_TYPE[])j.previous()), "Error (" + seed + "): divergence in previous()");
-				}
-
-				ensure(i.nextIndex() == j.nextIndex(), "Error (" + seed + "): divergence in nextIndex()");
-				ensure(i.previousIndex() == j.previousIndex(), "Error (" + seed + "): divergence in previousIndex()");
-
-			}
-
-		}
-
-		{
-			Object previous = null;
-			Object I, J;
-			int from = r.nextInt(m.size() +1);
-			ObjectListIterator i;
-			java.util.ListIterator j;
-			i = m.listIterator(from);
-			j = t.listIterator(from);
-
-			for(int k = 0; k < 2*n; k++) {
-				ensure(i.hasNext() == j.hasNext(), "Error (" + seed + "): divergence in hasNext() (iterator with starting point " + from + ")");
-				ensure(i.hasPrevious() == j.hasPrevious() , "Error (" + seed + "): divergence in hasPrevious() (iterator with starting point " + from + ")");
-
-				if (r.nextFloat() < .8 && i.hasNext()) {
-					ensure(java.util.Arrays.equals((KEY_TYPE[])i.next(), (KEY_TYPE[])j.next()), "Error (" + seed + "): divergence in next() (iterator with starting point " + from + ")");
-					//System.err.println("Done next " + I + " " + J + "  " + badPrevious);
-
-				}
-				else if (r.nextFloat() < .2 && i.hasPrevious()) {
-					ensure(java.util.Arrays.equals((KEY_TYPE[])i.previous(), (KEY_TYPE[])j.previous()), "Error (" + seed + "): divergence in previous() (iterator with starting point " + from + ")");
-
-				}
-			}
-
-		}
-
-
-
-		try {
-			java.io.File ff = new java.io.File("it.unimi.dsi.fastutil.test." + m.getClass().getSimpleName() + "." + n);
-			java.io.OutputStream os = new java.io.FileOutputStream(ff);
-			java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(os);
-
-			oos.writeObject(m);
-			oos.close();
-
-			java.io.InputStream is = new java.io.FileInputStream(ff);
-			java.io.ObjectInputStream ois = new java.io.ObjectInputStream(is);
-
-			m = (ARRAY_FRONT_CODED_LIST)ois.readObject();
-			ois.close();
-			ff.delete();
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-
-		ensure(contentEquals(m, t), "Error (" + seed + "): m does not equal t after save/read");
-
-		System.out.println("Test OK");
-		return;
-	}
-
-
-	public static void main(String args[]) {
-		int n  = Integer.parseInt(args[1]);
-		if (args.length > 2) r = new java.util.Random(seed = Long.parseLong(args[2]));
-
-		try {
-			if ("speedTest".equals(args[0]) || "speedComp".equals(args[0])) speedTest(n, "speedComp".equals(args[0]));
-			else if ("test".equals(args[0])) runTest(n);
-		} catch(Throwable e) {
-			e.printStackTrace(System.err);
-			System.err.println("seed: " + seed);
-		}
-	}
-
-#endif
-
-
 }

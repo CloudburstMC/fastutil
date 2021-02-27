@@ -7,7 +7,8 @@ GEN_SRCDIR ?= src
 export GEN_SRCDIR
 DOCSDIR = docs
 
-SMALL_TYPES ?= $(if $(NO_SMALL_TYPES),,1)
+SMALL_TYPES ?= $(if $(MINIMAL_TYPES),,1)
+IO_TYPES ?= $(if $(MINIMAL_TYPES),,1)
 
 APIURL=http://java.sun.com/j2se/5.0/docs/api # External URLs in the docs will point here
 
@@ -16,8 +17,6 @@ APIURL=http://java.sun.com/j2se/5.0/docs/api # External URLs in the docs will po
 .PHONY: all clean depend install docs jar tar jsources csources dirs
 
 .SECONDARY: $(JSOURCES)
-
-BYTE_NOSMALL=$(if $(SMALL_TYPES),,Byte)
 
 #  The capitalized types used to build class and method names; boolean and object types are not listed.
 TYPE_NOBOOL_NOOBJ= $(if $(SMALL_TYPES),Byte Short Char Float,) Int Long Double
@@ -31,9 +30,6 @@ TYPE_NOOBJ=$(if $(SMALL_TYPES),Boolean,) $(TYPE_NOBOOL_NOOBJ)
 #  The capitalized types used to build class and method names; references are not listed.
 TYPE_NOREF=$(TYPE_NOOBJ) Object
 
-#  The capitalized types used to build class and method names; references are not listed, byte is always included.
-TYPE_NOREF_B=$(BYTE_NOSMALL) $(TYPE_NOREF)
-
 #  The capitalized types used to build class and method names; boolean is not listed.
 TYPE_NOBOOL=$(TYPE_NOBOOL_NOREF) Reference
 
@@ -42,6 +38,15 @@ TYPE=$(TYPE_NOREF) Reference
 
 #  The capitalized types used to build class and method names; only types for which big structures are built are listed.
 TYPE_BIG=Int Long $(if $(SMALL_TYPES),Float,) Double Object Reference
+
+#  The capitalized types used to build functions (even in the case of NO_SMALL_TYPES)
+TYPE_ALL=Boolean Byte Short Char Float Int Long Double Object Reference
+
+#  The capitalized types used to build fragments (even in the case of NO_SMALL_TYPES)
+TYPE_NOOBJ_ALL=Boolean Byte Short Char Float Int Long Double
+
+#  All capitalized types except Reference (even in the case of NO_SMALL_TYPES)
+TYPE_NOREF_ALL=Boolean Byte Short Char Float Int Long Double Object
 
 
 # These variables are used as an associative array (using computed names).
@@ -64,9 +69,9 @@ explain:
 	@echo "will compile behavioral and speed tests into the classes.\n"
 	@echo "If you set the make variable ASSERTS (e.g., make sources ASSERTS=1),"
 	@echo "you will compile assertions into the classes.\n"
-	@echo "If you set the make variable NO_SMALL_TYPES (e.g.,"
-	@echo "make sources NO_SMALL_TYPES=1), you will only generate classes "
-	@echo "involving ints, longs and doubles (and some byte utility)."
+	@echo "If you set the make variable MINIMAL_TYPES (e.g.,"
+	@echo "make sources MINIMAL_TYPES=1), you will only generate classes "
+	@echo "involving ints, longs and doubles (and some necessary utility)."
 	@echo "Note that in this case some tests will not compile."
 
 source: pom
@@ -86,15 +91,15 @@ source: pom
 		fastutil-$(version)/LICENSE-2.0 \
 		fastutil-$(version)/makefile \
 		$(foreach f, $(SOURCES), fastutil-$(version)/$(f)) \
-		fastutil-$(version)/$(SOURCEDIR)/{boolean,byte,char,short,int,long,float,double,object}s/package.html \
-		fastutil-$(version)/$(SOURCEDIR)/io/package.html \
+		fastutil-$(version)/$(SOURCEDIR)/{boolean,byte,char,short,int,long,float,double,object}s/package-info.java \
+		fastutil-$(version)/$(SOURCEDIR)/io/package-info.java \
 		fastutil-$(version)/src/overview.html \
 		$$(find fastutil-$(version)/test -iname \*.java)
 	rm fastutil-$(version)
 
 binary:
 	make -s clean sources format
-	ant clean osgi javadoc
+	ant clean osgi jar javadoc
 	-rm -f fastutil-$(version)
 	ln -s . fastutil-$(version)
 	cp dist/lib/fastutil-$(version).jar .
@@ -112,7 +117,7 @@ pom:
 	(sed -e s/VERSION/$$(grep version build.properties | cut -d= -f2)/ <pom-model.xml >pom.xml)
 
 format:
-	$(ECLIPSE) -nosplash -application org.eclipse.jdt.core.JavaCodeFormatter -verbose -config $(CURDIR)/.settings/org.eclipse.jdt.core.prefs $(CURDIR)/src/it/unimi/dsi/fastutil/{booleans,bytes,shorts,chars,ints,floats,longs,doubles,objects}
+	$(ECLIPSE) -data workspace -nosplash -application org.eclipse.jdt.core.JavaCodeFormatter -verbose -config $(CURDIR)/.settings/org.eclipse.jdt.core.prefs $(CURDIR)/src/it/unimi/dsi/fastutil/{booleans,bytes,shorts,chars,ints,floats,longs,doubles,objects}
 
 stage: pom
 	(unset LOCAL_IVY_SETTINGS; ant stage)
@@ -126,7 +131,7 @@ dirs:
 # Interfaces
 #
 
-ITERABLES := $(foreach k,$(BYTE_NOSMALL) $(TYPE_NOREF), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Iterable.c)
+ITERABLES := $(foreach k,$(TYPE_NOREF), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Iterable.c)
 $(ITERABLES): drv/Iterable.drv; ./gencsource.sh $< $@ >$@
 
 CSOURCES += $(ITERABLES)
@@ -156,7 +161,7 @@ $(SORTED_SETS): drv/SortedSet.drv; ./gencsource.sh $< $@ >$@
 
 CSOURCES += $(SORTED_SETS)
 
-FUNCTIONS := $(foreach k,$(TYPE_NOBOOL), $(foreach v,$(TYPE), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)2$(v)Function.c))
+FUNCTIONS := $(foreach k,$(TYPE_ALL), $(foreach v,$(TYPE_ALL), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)2$(v)Function.c))
 $(FUNCTIONS): drv/Function.drv; ./gencsource.sh $< $@ >$@
 
 CSOURCES += $(FUNCTIONS)
@@ -191,20 +196,40 @@ $(INDIRECT_PRIORITY_QUEUES): drv/IndirectPriorityQueue.drv; ./gencsource.sh $< $
 
 CSOURCES += $(INDIRECT_PRIORITY_QUEUES)
 
-COMPARATORS := $(foreach k,$(BYTE_NOSMALL) $(TYPE_NOOBJ), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Comparator.c)
+COMPARATORS := $(foreach k,$(TYPE_NOOBJ_ALL), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Comparator.c)
 $(COMPARATORS): drv/Comparator.drv; ./gencsource.sh $< $@ >$@
 
 CSOURCES += $(COMPARATORS)
 
-CONSUMERS := $(foreach k,$(BYTE_NOSMALL) $(TYPE_NOOBJ), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Consumer.c)
+CONSUMERS := $(foreach k,$(TYPE_NOOBJ_ALL), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Consumer.c)
 $(CONSUMERS): drv/Consumer.drv; ./gencsource.sh $< $@ >$@
 
 CSOURCES += $(CONSUMERS)
 
-ITERATORS := $(foreach k,$(BYTE_NOSMALL) $(TYPE_NOREF), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Iterator.c)
+PREDICATES := $(foreach k,$(TYPE_NOOBJ), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Predicate.c)
+$(PREDICATES): drv/Predicate.drv; ./gencsource.sh $< $@ >$@
+
+CSOURCES += $(PREDICATES)
+
+BINARY_OPERATORS := $(foreach k,$(TYPE_NOOBJ), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)BinaryOperator.c)
+$(BINARY_OPERATORS): drv/BinaryOperator.drv; ./gencsource.sh $< $@ >$@
+
+CSOURCES += $(BINARY_OPERATORS)
+
+UNARY_OPERATORS := $(foreach k,$(TYPE_NOOBJ), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)UnaryOperator.c)
+$(UNARY_OPERATORS): drv/UnaryOperator.drv; ./gencsource.sh $< $@ >$@
+
+CSOURCES += $(UNARY_OPERATORS)
+
+ITERATORS := $(foreach k,$(TYPE_NOREF_ALL), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Iterator.c)
 $(ITERATORS): drv/Iterator.drv; ./gencsource.sh $< $@ >$@
 
 CSOURCES += $(ITERATORS)
+
+SPLITERATORS := $(foreach k,$(TYPE_NOREF_ALL), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Spliterator.c)
+$(SPLITERATORS): drv/Spliterator.drv; ./gencsource.sh $< $@ >$@
+
+CSOURCES += $(SPLITERATORS)
 
 BIDIRECTIONAL_ITERATORS := $(foreach k,$(TYPE_NOREF), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)BidirectionalIterator.c)
 $(BIDIRECTIONAL_ITERATORS): drv/BidirectionalIterator.drv; ./gencsource.sh $< $@ >$@
@@ -226,6 +251,17 @@ $(BIG_LIST_ITERATORS): drv/BigListIterator.drv; ./gencsource.sh $< $@ >$@
 
 CSOURCES += $(BIG_LIST_ITERATORS)
 
+PAIRS := $(foreach k,$(TYPE), $(foreach v,$(TYPE), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)$(v)Pair.c))
+$(PAIRS): drv/Pair.drv; ./gencsource.sh $< $@ >$@
+
+CSOURCES += $(PAIRS)
+
+SORTED_PAIRS := $(foreach k,$(TYPE_NOBOOL_NOOBJ), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)$(k)SortedPair.c)
+$(SORTED_PAIRS): drv/SortedPair.drv; ./gencsource.sh $< $@ >$@
+
+CSOURCES += $(SORTED_PAIRS)
+
+
 #
 # Abstract implementations
 #
@@ -245,7 +281,7 @@ $(ABSTRACT_SORTED_SETS): drv/AbstractSortedSet.drv; ./gencsource.sh $< $@ >$@
 
 CSOURCES += $(ABSTRACT_SORTED_SETS)
 
-ABSTRACT_FUNCTIONS := $(foreach k,$(TYPE_NOBOOL), $(foreach v,$(TYPE), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/Abstract$(k)2$(v)Function.c))
+ABSTRACT_FUNCTIONS := $(foreach k,$(TYPE), $(foreach v,$(TYPE), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/Abstract$(k)2$(v)Function.c))
 $(ABSTRACT_FUNCTIONS): drv/AbstractFunction.drv; ./gencsource.sh $< $@ >$@
 
 CSOURCES += $(ABSTRACT_FUNCTIONS)
@@ -304,6 +340,11 @@ ABSTRACT_BIG_LIST_ITERATORS := $(foreach k,$(TYPE_NOREF), $(GEN_SRCDIR)/$(PKG_PA
 $(ABSTRACT_BIG_LIST_ITERATORS): drv/AbstractBigListIterator.drv; ./gencsource.sh $< $@ >$@
 
 CSOURCES += $(ABSTRACT_BIG_LIST_ITERATORS)
+
+ABSTRACT_SPLITERATORS := $(foreach k,$(TYPE_NOREF), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/Abstract$(k)Spliterator.c)
+$(ABSTRACT_SPLITERATORS): drv/AbstractSpliterator.drv; ./gencsource.sh $< $@ >$@
+
+CSOURCES += $(ABSTRACT_SPLITERATORS)
 
 #
 # Concrete implementations
@@ -399,10 +440,20 @@ $(BIG_ARRAY_BIG_LISTS): drv/BigArrayBigList.drv; ./gencsource.sh $< $@ >$@
 
 CSOURCES += $(BIG_ARRAY_BIG_LISTS)
 
+IMMUTABLE_LISTS := $(foreach k,$(TYPE), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)ImmutableList.c)
+$(IMMUTABLE_LISTS): drv/ImmutableList.drv; ./gencsource.sh $< $@ >$@
+
+CSOURCES += $(IMMUTABLE_LISTS)
+
 FRONT_CODED_LISTS := $(foreach k, $(if $(SMALL_TYPES),Byte Short Char,) Int Long, $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)ArrayFrontCodedList.c)
 $(FRONT_CODED_LISTS): drv/ArrayFrontCodedList.drv; ./gencsource.sh $< $@ >$@
 
 CSOURCES += $(FRONT_CODED_LISTS)
+
+FRONT_CODED_BIG_LISTS := $(foreach k, $(if $(SMALL_TYPES),Byte Short Char,) Int Long, $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)ArrayFrontCodedBigList.c)
+$(FRONT_CODED_BIG_LISTS): drv/ArrayFrontCodedBigList.drv; ./gencsource.sh $< $@ >$@
+
+CSOURCES += $(FRONT_CODED_BIG_LISTS)
 
 HEAP_PRIORITY_QUEUES := $(foreach k,$(TYPE_NOBOOL_NOREF), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)HeapPriorityQueue.c)
 $(HEAP_PRIORITY_QUEUES): drv/HeapPriorityQueue.drv; ./gencsource.sh $< $@ >$@
@@ -434,6 +485,21 @@ $(ARRAY_INDIRECT_PRIORITY_QUEUES): drv/ArrayIndirectPriorityQueue.drv; ./gencsou
 
 CSOURCES += $(ARRAY_INDIRECT_PRIORITY_QUEUES)
 
+MUTABLE_PAIRS := $(foreach k,$(TYPE), $(foreach v,$(TYPE), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)$(v)MutablePair.c))
+$(MUTABLE_PAIRS): drv/MutablePair.drv; ./gencsource.sh $< $@ >$@
+
+CSOURCES += $(MUTABLE_PAIRS)
+
+IMMUTABLE_PAIRS := $(foreach k,$(TYPE), $(foreach v,$(TYPE), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)$(v)ImmutablePair.c))
+$(IMMUTABLE_PAIRS): drv/ImmutablePair.drv; ./gencsource.sh $< $@ >$@
+
+CSOURCES += $(IMMUTABLE_PAIRS)
+
+IMMUTABLE_SORTED_PAIRS := $(foreach k,$(TYPE_NOBOOL_NOREF), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)$(k)ImmutableSortedPair.c)
+$(IMMUTABLE_SORTED_PAIRS): drv/ImmutableSortedPair.drv; ./gencsource.sh $< $@ >$@
+
+CSOURCES += $(IMMUTABLE_SORTED_PAIRS)
+
 
 #
 # Static containers
@@ -445,10 +511,27 @@ $(ITERATORS_STATIC): drv/Iterators.drv; ./gencsource.sh $< $@ >$@
 CSOURCES += $(ITERATORS_STATIC)
 
 
+SPLITERATORS_STATIC := $(foreach k,$(TYPE_NOREF), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Spliterators.c)
+$(SPLITERATORS_STATIC): drv/Spliterators.drv; ./gencsource.sh $< $@ >$@
+
+CSOURCES += $(SPLITERATORS_STATIC)
+
+
 BIG_LIST_ITERATORS_STATIC := $(foreach k,$(TYPE_NOREF), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)BigListIterators.c)
 $(BIG_LIST_ITERATORS_STATIC): drv/BigListIterators.drv; ./gencsource.sh $< $@ >$@
 
 CSOURCES += $(BIG_LIST_ITERATORS_STATIC)
+
+BIG_SPLITERATORS_STATIC := $(foreach k,$(TYPE_NOREF), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)BigSpliterators.c)
+$(BIG_SPLITERATORS_STATIC): drv/BigSpliterators.drv; ./gencsource.sh $< $@ >$@
+
+CSOURCES += $(BIG_SPLITERATORS_STATIC)
+
+
+ITERABLES_STATIC := $(foreach k,$(TYPE_NOREF), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Iterables.c)
+$(ITERABLES_STATIC): drv/Iterables.drv; ./gencsource.sh $< $@ >$@
+
+CSOURCES += $(ITERABLES_STATIC)
 
 
 COLLECTIONS_STATIC := $(foreach k,$(TYPE), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Collections.c)
@@ -481,13 +564,13 @@ $(BIG_LISTS_STATIC): drv/BigLists.drv; ./gencsource.sh $< $@ >$@
 CSOURCES += $(BIG_LISTS_STATIC)
 
 
-ARRAYS_STATIC := $(foreach k,$(TYPE_NOREF_B), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Arrays.c)
+ARRAYS_STATIC := $(foreach k,$(TYPE_NOREF_ALL), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Arrays.c)
 $(ARRAYS_STATIC): drv/Arrays.drv; ./gencsource.sh $< $@ >$@
 
 CSOURCES += $(ARRAYS_STATIC)
 
 
-BIG_ARRAYS_STATIC := $(foreach k,$(TYPE_NOREF_B), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)BigArrays.c)
+BIG_ARRAYS_STATIC := $(foreach k,$(TYPE_NOREF_ALL), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)BigArrays.c)
 $(BIG_ARRAYS_STATIC): drv/BigArrays.drv; ./gencsource.sh $< $@ >$@
 
 CSOURCES += $(BIG_ARRAYS_STATIC)
@@ -535,7 +618,7 @@ $(SORTED_MAPS_STATIC): drv/SortedMaps.drv; ./gencsource.sh $< $@ >$@
 CSOURCES += $(SORTED_MAPS_STATIC)
 
 
-COMPARATORS_STATIC := $(foreach k,$(TYPE_NOREF), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Comparators.c)
+COMPARATORS_STATIC := $(foreach k,$(TYPE_NOREF_ALL), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/$(k)Comparators.c)
 $(COMPARATORS_STATIC): drv/Comparators.drv; ./gencsource.sh $< $@ >$@
 
 CSOURCES += $(COMPARATORS_STATIC)
@@ -544,7 +627,7 @@ CSOURCES += $(COMPARATORS_STATIC)
 # Fragmented stuff
 #
 
-BINIO_FRAGMENTS := $(foreach k,$(TYPE_NOREF_B), $(GEN_SRCDIR)/$(PKG_PATH)/io/$(k)BinIOFragment.h)
+BINIO_FRAGMENTS := $(foreach k,$(if $(IO_TYPES),$(TYPE_NOOBJ),), $(GEN_SRCDIR)/$(PKG_PATH)/io/$(k)BinIOFragment.h)
 $(BINIO_FRAGMENTS): drv/BinIOFragment.drv; ./gencsource.sh $< $@ >$@
 
 CFRAGMENTS += $(BINIO_FRAGMENTS)
@@ -552,10 +635,10 @@ CFRAGMENTS += $(BINIO_FRAGMENTS)
 $(GEN_SRCDIR)/$(PKG_PATH)/io/BinIO.c: drv/BinIO.drv $(BINIO_FRAGMENTS)
 	./gencsource.sh drv/BinIO.drv $@ >$@
 
-CSOURCES += $(GEN_SRCDIR)/$(PKG_PATH)/io/BinIO.c
+CSOURCES += $(if $(IO_TYPES),$(GEN_SRCDIR)/$(PKG_PATH)/io/BinIO.c,)
 
 
-TEXTIO_FRAGMENTS := $(foreach k,$(TYPE_NOOBJ), $(GEN_SRCDIR)/$(PKG_PATH)/io/$(k)TextIOFragment.h)
+TEXTIO_FRAGMENTS := $(foreach k,$(if $(IO_TYPES),$(TYPE_NOOBJ),), $(GEN_SRCDIR)/$(PKG_PATH)/io/$(k)TextIOFragment.h)
 $(TEXTIO_FRAGMENTS): drv/TextIOFragment.drv; ./gencsource.sh $< $@ >$@
 
 CFRAGMENTS += $(TEXTIO_FRAGMENTS)
@@ -563,10 +646,10 @@ CFRAGMENTS += $(TEXTIO_FRAGMENTS)
 $(GEN_SRCDIR)/$(PKG_PATH)/io/TextIO.c: drv/TextIO.drv $(TEXTIO_FRAGMENTS)
 	./gencsource.sh drv/TextIO.drv $@ >$@
 
-CSOURCES += $(GEN_SRCDIR)/$(PKG_PATH)/io/TextIO.c
+CSOURCES += $(if $(IO_TYPES),$(GEN_SRCDIR)/$(PKG_PATH)/io/TextIO.c,)
 
 
-BIG_ARRAYS_FRAGMENTS := $(foreach k,$(TYPE_NOREF_B), $(GEN_SRCDIR)/$(PKG_PATH)/$(k)BigArraysFragment.h)
+BIG_ARRAYS_FRAGMENTS := $(foreach k,$(TYPE_NOREF_ALL), $(GEN_SRCDIR)/$(PKG_PATH)/$(k)BigArraysFragment.h)
 $(BIG_ARRAYS_FRAGMENTS): drv/BigArraysFragment.drv; ./gencsource.sh $< $@ >$@
 
 CFRAGMENTS += $(BIG_ARRAYS_FRAGMENTS)
@@ -577,11 +660,10 @@ $(GEN_SRCDIR)/$(PKG_PATH)/BigArrays.c: drv/BigArraysCommon.drv $(BIG_ARRAYS_FRAG
 CSOURCES += $(GEN_SRCDIR)/$(PKG_PATH)/BigArrays.c
 
 
-
 JSOURCES = $(CSOURCES:.c=.java) # The list of generated Java source files
 
 
-
+# These are True Java Sources instead
 SOURCES = \
 	$(SOURCEDIR)/Function.java \
 	$(SOURCEDIR)/Hash.java \
@@ -591,6 +673,8 @@ SOURCES = \
 	$(SOURCEDIR)/BigList.java \
 	$(SOURCEDIR)/BigListIterator.java \
 	$(SOURCEDIR)/PriorityQueue.java \
+	$(SOURCEDIR)/Pair.java \
+	$(SOURCEDIR)/SortedPair.java \
 	$(SOURCEDIR)/IndirectPriorityQueue.java \
 	$(SOURCEDIR)/Arrays.java \
 	$(SOURCEDIR)/Swapper.java \
@@ -611,27 +695,27 @@ SOURCES = \
 	$(SOURCEDIR)/io/MeasurableInputStream.java \
 	$(SOURCEDIR)/io/MeasurableOutputStream.java \
 	$(SOURCEDIR)/io/MeasurableStream.java \
-	$(SOURCEDIR)/io/RepositionableStream.java # These are True Java Sources instead
-
+	$(SOURCEDIR)/io/RepositionableStream.java
 
 # We pass each generated Java source through the gccpreprocessor. TEST compiles in the test code,
 # whereas ASSERTS compiles in some assertions (whose testing, of course, must be enabled in the JVM).
 
 $(JSOURCES): %.java: %.c
-	$(CC) -w -I. -DSMALL_TYPES=$(if $(SMALL_TYPES),1,0) $(if $(TEST),-DTEST,) $(if $(ASSERTS),-DASSERTS_CODE,) -DASSERTS_VALUE=$(if $(ASSERTS),true,false) -E -C -P $< \
+	$(CC) -w -I. $(if $(TEST),-DTEST,) $(if $(ASSERTS),-DASSERTS_CODE,) -DASSERTS_VALUE=$(if $(ASSERTS),true,false) -E -C -P $< \
 		| sed -e '1,/START_OF_JAVA_SOURCE/d' -e 's/^ /	/' >$@
 
-
 clean:
+	-@mkdir -p build
 	-@find build -name \*.class -exec rm {} \;
 	-@find . -name \*.java~ -exec rm {} \;
 	-@find . -name \*.html~ -exec rm {} \;
-	-@rm -f $(foreach k, $(sort $(TYPE)), $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k))/*.java)
+	-@$(foreach k, $(sort $(TYPE_ALL)), find $(GEN_SRCDIR)/$(PKG_PATH)/$(PACKAGE_$(k)) -iname \*.java -and -not -iname \*-info.java -delete &&) true
 	-@rm -f $(GEN_SRCDIR)/$(PKG_PATH)/io/*IO.java
 	-@rm -f $(GEN_SRCDIR)/$(PKG_PATH)/BigArrays.java
 	-@rm -f $(GEN_SRCDIR)/$(PKG_PATH)/*.[chj] $(GEN_SRCDIR)/$(PKG_PATH)/*/*.[chj]
 	-@rm -fr $(DOCSDIR)/*
 
 sources: $(JSOURCES)
+	rm $(GEN_SRCDIR)/it/unimi/dsi/fastutil/objects/ObjectObjectPair.java
 
 csources: $(CSOURCES)

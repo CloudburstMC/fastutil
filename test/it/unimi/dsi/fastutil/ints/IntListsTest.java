@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil.ints;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +14,8 @@ package it.unimi.dsi.fastutil.ints;
  * limitations under the License.
  */
 
+package it.unimi.dsi.fastutil.ints;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -23,12 +23,14 @@ import java.util.RandomAccess;
 
 import org.junit.Test;
 
+import it.unimi.dsi.fastutil.MainRunner;
+
 public class IntListsTest {
 	@Test
 	public void testRandomAccess() {
 		final IntList fakeList = new AbstractIntList() {
 			@Override
-			public int getInt(int index) {
+			public int getInt(final int index) {
 				return 0;
 			}
 			@Override
@@ -44,5 +46,10 @@ public class IntListsTest {
 		assertTrue(IntLists.unmodifiable(new IntArrayList()) instanceof RandomAccess);
 		assertTrue(IntLists.synchronize(new IntArrayList()) instanceof RandomAccess);
 		assertTrue(IntLists.synchronize(new IntArrayList(), new Object()) instanceof RandomAccess);
+	}
+	
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(IntLists.class, "int", /*seed=*/"9389487");
 	}
 }

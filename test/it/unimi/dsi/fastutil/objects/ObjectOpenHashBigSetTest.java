@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil.objects;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +14,8 @@ package it.unimi.dsi.fastutil.objects;
  * limitations under the License.
  */
 
+package it.unimi.dsi.fastutil.objects;
+
 import static it.unimi.dsi.fastutil.BigArrays.get;
 import static it.unimi.dsi.fastutil.BigArrays.length;
 import static org.junit.Assert.assertEquals;
@@ -29,6 +29,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import it.unimi.dsi.fastutil.Hash;
+import it.unimi.dsi.fastutil.MainRunner;
 
 @SuppressWarnings("rawtypes")
 public class ObjectOpenHashBigSetTest {
@@ -76,6 +77,43 @@ public class ObjectOpenHashBigSetTest {
 
 		// Fails
 		assertEquals(referenceInstance, instance);
+	}
+
+	// Here because IntOpenHashBigSet has neither an of() nor a wrap().
+	@SafeVarargs
+	private static <T> ObjectOpenHashBigSet<T> setOf(final T... elements) {
+		final ObjectOpenHashBigSet<T> result = new ObjectOpenHashBigSet<>(elements.length);
+		for (final T i : elements) {
+			result.add(i);
+		}
+		return result;
+	}
+
+	@Test
+	public void testToBigSet() {
+		final ObjectOpenHashBigSet<String> baseSet = setOf("wood", "board", "glass", "metal");
+		final ObjectOpenHashBigSet<String> transformed = baseSet.stream().map(s -> "ply" + s).collect(ObjectOpenHashBigSet.toBigSet());
+		assertEquals(setOf("plywood", "plyboard", "plyglass", "plymetal"), transformed);
+	}
+
+	@Test
+	public void testSpliteratorTrySplit() {
+		final ObjectOpenHashBigSet<String> baseSet = setOf("0", "1", "2", "3", "4", "5", "bird");
+		final ObjectSpliterator<String> spliterator1 = baseSet.spliterator();
+		assertEquals(baseSet.size64(), spliterator1.getExactSizeIfKnown());
+		final ObjectSpliterator<String> spliterator2 = spliterator1.trySplit();
+		// No assurance of where we split, but where ever it is it should be a perfect split.
+		final java.util.stream.Stream<String> stream1 = java.util.stream.StreamSupport.stream(spliterator1, false);
+		final java.util.stream.Stream<String> stream2 = java.util.stream.StreamSupport.stream(spliterator2, false);
+
+		final ObjectOpenHashBigSet<String> subSet1 = stream1.collect(ObjectOpenHashBigSet.toBigSet());
+		// Intentionally collecting to a list for this second one.
+		final ObjectBigArrayBigList<String> subSet2 = stream2.collect(ObjectBigArrayBigList.toBigList());
+		assertEquals(baseSet.size64(), subSet1.size64() + subSet2.size64());
+		final ObjectOpenHashBigSet<String> recombinedSet = new ObjectOpenHashBigSet<>(baseSet.size64());
+		recombinedSet.addAll(subSet1);
+		recombinedSet.addAll(subSet2);
+		assertEquals(baseSet, recombinedSet);
 	}
 
 	private static java.util.Random r = new java.util.Random(0);
@@ -137,8 +175,7 @@ public class ObjectOpenHashBigSetTest {
 		printProbes(m);
 		checkTable(m);
 		/* Now we check that m actually holds that data. */
-		for (final java.util.Iterator i = t.iterator(); i.hasNext();) {
-			final Object e = i.next();
+		for (Object e : t) {
 			assertTrue("Error: m and t differ on a key (" + e + ") after insertion (iterating on t)", m.contains(e));
 		}
 		/* Now we check that m actually holds that data, but iterating on m. */
@@ -193,8 +230,7 @@ public class ObjectOpenHashBigSetTest {
 		/*
 		 * Now we check that m actually holds that data.
 		 */
-		for (final java.util.Iterator i = t.iterator(); i.hasNext();) {
-			final Object e = i.next();
+		for (Object e : t) {
 			assertTrue("Error: m and t differ on a key (" + e + ") after removal (iterating on t)", m.contains(e));
 		}
 		/* Now we check that m actually holds that data, but iterating on m. */
@@ -284,5 +320,10 @@ public class ObjectOpenHashBigSetTest {
 		assertTrue(s.add(a));
 		assertSame(a, s.get("a"));
 		assertNull(s.get("b"));
+	}
+
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(ObjectOpenHashBigSet.class, "test", /*num=*/"500", /*loadFactor=*/"0.75", /*seed=*/"383474");
 	}
 }

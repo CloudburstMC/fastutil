@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2020 Sebastiano Vigna
+ * Copyright (C) 2002-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,10 @@ import it.unimi.dsi.fastutil.Size64;
 import it.unimi.dsi.fastutil.HashCommon;
 import static it.unimi.dsi.fastutil.HashCommon.bigArraySize;
 import static it.unimi.dsi.fastutil.HashCommon.maxFill;
+#if KEYS_REFERENCE
+import java.util.function.Consumer;
+import java.util.stream.Collector;
+#endif
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -149,7 +153,7 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 	 */
 
 	public OPEN_HASH_BIG_SET(final Collection<? extends KEY_GENERIC_CLASS> c, final float f) {
-		this(c.size(), f);
+		this(Size64.sizeOf(c), f);
 		addAll(c);
 	}
 
@@ -170,7 +174,7 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 	 */
 
 	public OPEN_HASH_BIG_SET(final COLLECTION KEY_EXTENDS_GENERIC c, final float f) {
-		this(c.size(), f);
+		this(Size64.sizeOf(c), f);
 		addAll(c);
 	}
 
@@ -273,6 +277,66 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 		this(a, DEFAULT_LOAD_FACTOR);
 	}
 
+#ifndef Custom
+#if KEYS_INT_LONG_DOUBLE
+	/** Collects the result of a primitive {@code Stream} into a new big hash set.
+	 *
+	 * <p>This method performs a terminal operation on the given {@code Stream}
+	 *
+	 * @apiNote Taking a primitive stream instead of returning something like a
+	 * {@link java.util.stream.Collector Collector} is necessary because there is no
+	 * primitive {@code Collector} equivalent in the Java API.
+	 */
+	 public static KEY_GENERIC OPEN_HASH_BIG_SET KEY_GENERIC toBigSet(JDK_PRIMITIVE_STREAM stream) {
+	 	return stream.collect(
+	 		OPEN_HASH_BIG_SET::new,
+	 		OPEN_HASH_BIG_SET::add,
+	 		OPEN_HASH_BIG_SET::addAll);
+	 }
+	 
+	/** Collects the result of a primitive {@code Stream} into a new big hash set.
+	 *
+	 * <p>This method performs a terminal operation on the given {@code Stream}
+	 *
+	 * @apiNote Taking a primitive stream instead returning something like a
+	 * {@link java.util.stream.Collector Collector} is necessary because there is no
+	 * primitive {@code Collector} equivalent in the Java API.
+	 */
+	public static KEY_GENERIC OPEN_HASH_BIG_SET KEY_GENERIC toBigSetWithExpectedSize(JDK_PRIMITIVE_STREAM stream, long expectedSize) {
+		return stream.collect(
+			() -> new OPEN_HASH_BIG_SET KEY_GENERIC(expectedSize),
+			OPEN_HASH_BIG_SET::add,
+			OPEN_HASH_BIG_SET::addAll);
+	}
+#elif KEYS_REFERENCE
+	// Collector wants a function that returns the collection being added to.
+	private OPEN_HASH_BIG_SET KEY_GENERIC combine(OPEN_HASH_BIG_SET KEY_EXTENDS_GENERIC toAddFrom) {
+		addAll(toAddFrom);
+		return this;
+	}
+
+	private static final Collector<KEY_TYPE, ?, OPEN_HASH_BIG_SET<KEY_TYPE>> TO_SET_COLLECTOR =
+		Collector.of(
+			OPEN_HASH_BIG_SET::new,
+			OPEN_HASH_BIG_SET::add,
+			OPEN_HASH_BIG_SET::combine); 
+
+	/** Returns a {@link Collector} that collects a {@code Stream}'s elements into a new big hash set. */
+	SUPPRESS_WARNINGS_KEY_UNCHECKED_RAWTYPES
+	public static KEY_GENERIC Collector<KEY_GENERIC_TYPE, ?, OPEN_HASH_BIG_SET KEY_GENERIC> toBigSet() {
+		return (Collector) TO_SET_COLLECTOR;
+	}
+
+ 	/** Returns a {@link Collector} that collects a {@code Stream}'s elements into a new big hash set. */
+ 	public static KEY_GENERIC Collector<KEY_GENERIC_TYPE, ?, OPEN_HASH_BIG_SET KEY_GENERIC> toBigSetWithExpectedSize(long expectedSize) {
+ 		return Collector.of(
+		() -> new OPEN_HASH_BIG_SET KEY_GENERIC(expectedSize),
+		OPEN_HASH_BIG_SET::add,
+		OPEN_HASH_BIG_SET::combine);
+	}
+#endif
+#endif
+
 	private long realSize() {
 		return containsNull ? size - 1 : size;
 	}
@@ -284,7 +348,7 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 
 	@Override
 	public boolean addAll(Collection<? extends KEY_GENERIC_CLASS> c) {
-		final long size = c instanceof Size64 ? ((Size64)c).size64() : c.size();
+		final long size = Size64.sizeOf(c);
 		// The resulting collection will be at least c.size() big
 		if (f <= .5) ensureCapacity(size); // The resulting collection will be sized for c.size() elements
 		else ensureCapacity(size64() + size); // The resulting collection will be sized for size() + c.size() elements
@@ -294,7 +358,7 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 #if KEYS_PRIMITIVE
 	@Override
 	public boolean addAll(COLLECTION c) {
-		final long size = c instanceof Size64 ? ((Size64)c).size64() : c.size();
+		final long size = Size64.sizeOf(c);
 		if (f <= .5) ensureCapacity(size); // The resulting collection will be size for c.size() elements
 		else ensureCapacity(size64() + size); // The resulting collection will be sized for size() + c.size() elements
 		return super.addAll(c);
@@ -602,6 +666,158 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 		return new SetIterator();
 	}
 
+
+	private class SetSpliterator implements KEY_SPLITERATOR KEY_GENERIC {
+		/* For the sake of keeping things at least somewhat simple
+		 * (aka. my sanity), the spliterator will NOT handle the indexing
+		 * of the subarrays directly, like iterator does. Instead, it will
+		 * delegate to BigArrays and have only a single, unified index it
+		 * will fence on. This is probably less effecient, but it avoids having
+		 * to track what it means to split on two sets of indexes.
+		 * This may change in the future if the performance hit high.
+		 */
+
+		private static final int POST_SPLIT_CHARACTERISTICS = SPLITERATORS.SET_SPLITERATOR_CHARACTERISTICS & ~java.util.Spliterator.SIZED;
+
+		/** The index (which bucket) of the next item to give to the action. */
+		long pos = 0;
+		/** The maximum bucket (exclusive) to iterate to */
+		long max = n;
+		/** An upwards counter counting how many we have given */
+		long c = 0;
+		/** A boolean telling us whether we should return the null key. */
+		boolean mustReturnNull = OPEN_HASH_BIG_SET.this.containsNull;
+		boolean hasSplit = false;
+
+
+		SetSpliterator() {}
+
+		SetSpliterator(long pos, long max, boolean mustReturnNull, boolean hasSplit) {
+			this.pos = pos;
+			this.max = max;
+			this.mustReturnNull = mustReturnNull;
+			this.hasSplit = hasSplit;
+		}
+
+		@Override
+		public boolean tryAdvance(final METHOD_ARG_KEY_CONSUMER action) {
+			if (mustReturnNull) {
+				mustReturnNull = false;
+				++c;
+				action.accept(KEY_NULL);
+				return true;
+			}
+			final KEY_GENERIC_TYPE key[][] = OPEN_HASH_BIG_SET.this.key;
+			while (pos < max) {
+				KEY_GENERIC_TYPE gotten = BigArrays.get(key, pos);
+				if (! KEY_IS_NULL(gotten)) {
+					++c;
+					++pos;
+					action.accept(gotten);
+					return true;
+				} else {
+					++pos;
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public void forEachRemaining(final METHOD_ARG_KEY_CONSUMER action) {
+			if (mustReturnNull) {
+				mustReturnNull = false;
+				action.accept(KEY_NULL);
+				++c;
+			}
+			final KEY_GENERIC_TYPE key[][] = OPEN_HASH_BIG_SET.this.key;
+			while (pos < max) {
+				KEY_GENERIC_TYPE gotten = BigArrays.get(key, pos);
+				if (! KEY_IS_NULL(gotten)) {
+					action.accept(gotten);
+					++c;
+				}
+				++pos;
+			}
+		}
+
+		@Override
+		public int characteristics() {
+			return hasSplit ? POST_SPLIT_CHARACTERISTICS : SPLITERATORS.SET_SPLITERATOR_CHARACTERISTICS;
+		}
+
+		@Override
+		public long estimateSize() {
+			if (!hasSplit) {
+				// Root spliterator; we know how many are remaining.
+				return size - c;
+			} else {
+				// After we split, we can no longer know exactly how many we have (or at least not efficiently).
+				// (size / n) * (max - pos) aka currentTableDensity * numberOfBucketsLeft seems like a good estimate.
+				return Math.min(size - c, (long)(((double)realSize() / n) * (max - pos)) + (mustReturnNull ? 1 : 0));
+			}
+		}
+
+		@Override
+		public SetSpliterator trySplit() {
+			if (pos >= max - 1) return null;
+			long retLen = (max - pos) >> 1;
+			if (retLen <= 1) return null;
+			long myNewPos = pos + retLen;
+			// Align to an outer array boundary if possible
+			// We add/subtract one to the bounds to ensure the new pos will always shrink the range
+			myNewPos = BigArrays.nearestSegmentStart(myNewPos, pos + 1, max - 1);
+			long retPos = pos;
+			long retMax = myNewPos;
+			// Since null is returned first, and the convention is that the returned split is the prefix of elements,
+			// the split will take care of returning null (if needed), and we won't return it anymore.
+			SetSpliterator split = new SetSpliterator(retPos, retMax, mustReturnNull, true);
+			this.pos = myNewPos;
+			this.mustReturnNull = false;
+			this.hasSplit = true;
+			return split;
+		}
+
+		@Override
+		public long skip(long n) {
+			if (n < 0) throw new IllegalArgumentException("Argument must be nonnegative: " + n);
+			if (n == 0) return 0;
+			long skipped = 0;
+			if (mustReturnNull) {
+				mustReturnNull = false;
+				++skipped;
+				--n;
+			}
+			final KEY_GENERIC_TYPE key[][] = OPEN_HASH_BIG_SET.this.key;
+			while (pos < max && n > 0) {
+				if (! KEY_IS_NULL(BigArrays.get(key, pos++))) {
+					++skipped;
+					--n;
+				}
+			}
+			return skipped;
+		}
+	}
+
+	@Override
+	public KEY_SPLITERATOR KEY_GENERIC spliterator() {
+		return new SetSpliterator();
+	}
+
+	@Override
+	public void forEach(final METHOD_ARG_KEY_CONSUMER action) {
+		if (containsNull) {
+			action.accept(KEY_NULL);
+		}
+		long pos = 0;
+		final long max = n;
+		final KEY_GENERIC_TYPE key[][] = this.key;
+		while (pos < max) {
+			KEY_GENERIC_TYPE gotten = BigArrays.get(key, pos++);
+			if (! KEY_IS_NULL(gotten)) {
+				action.accept(gotten);
+			}
+		}
+	}
 
 	/** Rehashes this set, making the table as small as possible.
 	 *
@@ -911,6 +1127,9 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 		return format.format(d, s, fp).toString();
 	}
 
+	// TODO Use a ASSERTS like preprocessor variable?
+	private static final boolean PARALLEL_STREAMS = Boolean.getBoolean("useParallelStreams");
+
 	private static void speedTest(int n, float f, boolean comp) {
 		int i, j;
 		OPEN_HASH_BIG_SET m;
@@ -1042,8 +1261,7 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 
 
 	private static void fatal(String msg) {
-		System.out.println(msg);
-		System.exit(1);
+		throw new AssertionError(msg);
 	}
 
 	private static void ensure(boolean cond, String msg) {
@@ -1077,7 +1295,7 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 			3 * Math.sqrt(3) * (f / ((1 - f) * (1 - f))) + 4 / (9 * f) - 1
 		) + "; actual: " + expected + "; stddev: " + Math.sqrt(totSquareProbes / m.n - expected * expected)  + "; max probes: " + maxProbes);
 	}
-	private static void runTest(int n, float f) {
+	private static void runTest(int n, float f) throws Exception {
 		int c;
 		OPEN_HASH_BIG_SET m = new OPEN_HASH_BIG_SET(Hash.DEFAULT_INITIAL_SIZE, f);
 		java.util.Set t = new java.util.HashSet();
@@ -1090,18 +1308,15 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 
 		m.addAll(t);
 
-		if (!m.equals(t)) System.out.println("Error (" + seed + "): !m.equals(t) after insertion");
-		if (!t.equals(m)) System.out.println("Error (" + seed + "): !t.equals(m) after insertion");
+		ensure(m.equals(t), "Error (" + seed + "): !m.equals(t) after insertion");;
+		ensure(t.equals(m), "Error (" + seed + "): !t.equals(m) after insertion");;
 		printProbes(m);
 
 		/* Now we check that m actually holds that data. */
 
 		for(java.util.Iterator i=t.iterator(); i.hasNext();) {
 			Object e = i.next();
-			if (!m.contains(e)) {
-				System.out.println("Error (" + seed + "): m and t differ on a key ("+e+") after insertion (iterating on t)");
-				System.exit(1);
-			}
+			ensure(m.contains(e), "Error (" + seed + "): m and t differ on a key ("+e+") after insertion (iterating on t)");
 		}
 
 		/* Now we check that m actually holds that data, but iterating on m. */
@@ -1110,25 +1325,16 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 		for(java.util.Iterator i=m.iterator(); i.hasNext();) {
 			Object e = i.next();
 			c++;
-			if (!t.contains(e)) {
-				System.out.println("Error (" + seed + "): m and t differ on a key ("+e+") after insertion (iterating on m)");
-				System.exit(1);
-			}
+			ensure(t.contains(e), "Error (" + seed + "): m and t differ on a key ("+e+") after insertion (iterating on m)");
 		}
 
-		if (c != t.size()) {
-			System.out.println("Error (" + seed + "): m has only " + c + " keys instead of " + t.size() + " after insertion (iterating on m)");
-			System.exit(1);
-		}
+		ensure(c == t.size(), "Error (" + seed + "): m has only " + c + " keys instead of " + t.size() + " after insertion (iterating on m)");
 		/* Now we check that inquiries about random data give the same answer in m and t. For
 		   m we use the polymorphic method. */
 
 		for(int i=0; i<n;  i++) {
 			KEY_TYPE T = genKey();
-			if (m.contains(T) != t.contains(KEY2OBJ(T))) {
-				System.out.println("Error (" + seed + "): divergence in keys between t and m (polymorphic method)");
-				System.exit(1);
-			}
+			ensure(m.contains(T) == t.contains(KEY2OBJ(T)), "Error (" + seed + "): divergence in keys between t and m (polymorphic method)");
 		}
 
 		/* Again, we check that inquiries about random data give the same answer in m and t, but
@@ -1136,10 +1342,7 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 
 		for(int i=0; i<n;  i++) {
 			KEY_TYPE T = genKey();
-			if (m.contains(KEY2OBJ(T)) != t.contains(KEY2OBJ(T))) {
-				System.out.println("Error (" + seed + "): divergence between t and m (standard method)");
-				System.exit(1);
-			}
+			ensure(m.contains(KEY2OBJ(T)) == t.contains(KEY2OBJ(T)), "Error (" + seed + "): divergence between t and m (standard method)");
 		}
 
 
@@ -1147,38 +1350,26 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 
 		for(int i=0; i<20*n;  i++) {
 			KEY_TYPE T = genKey();
-			if (m.add(KEY2OBJ(T)) != t.add(KEY2OBJ(T))) {
-				System.out.println("Error (" + seed + "): divergence in add() between t and m");
-				System.exit(1);
-			}
+			ensure(m.add(KEY2OBJ(T)) == t.add(KEY2OBJ(T)), "Error (" + seed + "): divergence in add() between t and m");
 			T = genKey();
-			if (m.remove(KEY2OBJ(T)) != t.remove(KEY2OBJ(T))) {
-				System.out.println("Error (" + seed + "): divergence in remove() between t and m");
-				System.exit(1);
-			}
+			ensure(m.remove(KEY2OBJ(T)) == t.remove(KEY2OBJ(T)), "Error (" + seed + "): divergence in remove() between t and m");
 		}
 
-		if (!m.equals(t)) System.out.println("Error (" + seed + "): !m.equals(t) after removal");
-		if (!t.equals(m)) System.out.println("Error (" + seed + "): !t.equals(m) after removal");
+		ensure(m.equals(t), "Error (" + seed + "): !m.equals(t) after removal");;
+		ensure(t.equals(m), "Error (" + seed + "): !t.equals(m) after removal");;
 
 		/* Now we check that m actually holds that data. */
 
 		for(java.util.Iterator i=t.iterator(); i.hasNext();) {
 			Object e = i.next();
-			if (!m.contains(e)) {
-				System.out.println("Error (" + seed + "): m and t differ on a key ("+e+") after removal (iterating on t)");
-				System.exit(1);
-			}
+			ensure(m.contains(e), "Error (" + seed + "): m and t differ on a key ("+e+") after removal (iterating on t)");
 		}
 
 		/* Now we check that m actually holds that data, but iterating on m. */
 
 		for(java.util.Iterator i=m.iterator(); i.hasNext();) {
 			Object e = i.next();
-			if (!t.contains(e)) {
-				System.out.println("Error (" + seed + "): m and t differ on a key ("+e+") after removal (iterating on m)");
-				System.exit(1);
-			}
+			ensure(t.contains(e), "Error (" + seed + "): m and t differ on a key ("+e+") after removal (iterating on m)");
 		}
 
 		printProbes(m);
@@ -1186,8 +1377,7 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 		/* Now we make m into an array, make it again a set and check it is OK. */
 		KEY_TYPE a[] = m.TO_KEY_ARRAY();
 
-		if (!new OPEN_HASH_BIG_SET(a).equals(m))
-			System.out.println("Error (" + seed + "): toArray() output (or array-based constructor) is not OK");
+		ensure(new OPEN_HASH_BIG_SET(a).equals(m), "Error (" + seed + "): toArray() output (or array-based constructor) is not OK");
 
 		/* Now we check cloning. */
 
@@ -1198,7 +1388,7 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 
 		/* Now we save and read m. */
 
-		try {
+		{
 			java.io.File ff = new java.io.File("it.unimi.dsi.fastutil.test." + m.getClass().getSimpleName() + "." + n);
 			java.io.OutputStream os = new java.io.FileOutputStream(ff);
 			java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(os);
@@ -1213,13 +1403,9 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 			ois.close();
 			ff.delete();
 		}
-		catch(Exception e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
 
-#if !KEY_CLASS_Reference
-		if (m.hashCode() != h) System.out.println("Error (" + seed + "): hashCode() changed after save/read");
+#if !KEYS_USE_REFERENCE_EQUALITY
+		ensure(m.hashCode() == h, "Error (" + seed + "): hashCode() changed after save/read");;
 
 		printProbes(m);
 
@@ -1227,10 +1413,7 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 
 		for(java.util.Iterator i=m.iterator(); i.hasNext();) {
 			Object e = i.next();
-			if (!t.contains(e)) {
-				System.out.println("Error (" + seed + "): m and t differ on a key ("+e+") after save/read");
-				System.exit(1);
-			}
+			ensure(t.contains(e), "Error (" + seed + "): m and t differ on a key ("+e+") after save/read");
 		}
 #else
 		m.clear();
@@ -1241,29 +1424,54 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 
 		for(int i=0; i<20*n;  i++) {
 			KEY_TYPE T = genKey();
-			if (m.add(KEY2OBJ(T)) != t.add(KEY2OBJ(T))) {
-				System.out.println("Error (" + seed + "): divergence in add() between t and m after save/read");
-				System.exit(1);
-			}
+			ensure(m.add(KEY2OBJ(T)) == t.add(KEY2OBJ(T)), "Error (" + seed + "): divergence in add() between t and m after save/read");
 			T = genKey();
-			if (m.remove(KEY2OBJ(T)) != t.remove(KEY2OBJ(T))) {
-				System.out.println("Error (" + seed + "): divergence in remove() between t and m after save/read");
-				System.exit(1);
-			}
+			ensure(m.remove(KEY2OBJ(T)) == t.remove(KEY2OBJ(T)), "Error (" + seed + "): divergence in remove() between t and m after save/read");
 		}
 
-		if (!m.equals(t)) System.out.println("Error (" + seed + "): !m.equals(t) after post-save/read removal");
-		if (!t.equals(m)) System.out.println("Error (" + seed + "): !t.equals(m) after post-save/read removal");
+		ensure(m.equals(t), "Error (" + seed + "): !m.equals(t) after post-save/read removal");;
+		ensure(t.equals(m), "Error (" + seed + "): !t.equals(m) after post-save/read removal");;
+
+/* Now test that the sets hold the same data using streams */
+		{
+#if KEYS_REFERENCE
+			java.util.stream.Stream<KEY_TYPE> i = m.stream();
+			java.util.stream.Stream<KEY_TYPE> j = t.stream();
+#elif KEY_CLASS_Boolean
+			java.util.stream.Stream<KEY_CLASS> i = m.stream();
+			java.util.stream.Stream<KEY_CLASS> j = t.stream();
+#else
+			JDK_PRIMITIVE_STREAM i = m.KEY_WIDENED_STREAM_METHOD();
+			java.util.stream.Stream<KEY_CLASS> j = t.stream();
+#endif
+
+			if (PARALLEL_STREAMS) {
+				i = i.parallel();
+				j = j.parallel();
+			}
+
+			i = i.sorted();
+			j = j.sorted();
+
+#if KEYS_REFERENCE || KEY_CLASS_Boolean
+			Object[] iArray = i.toArray();
+			Object[] jArray = j.toArray();
+#elif KEY_CLASS_Character
+			int[] iArray = i.toArray();
+			int[] jArray = j.mapToInt(c -> (int)c.charValue()).toArray();
+#else
+			KEY_TYPE_WIDENED[] iArray = i.toArray();
+			KEY_TYPE_WIDENED[] jArray = j.MAP_TO_KEY_WIDENED(Number::KEY_WIDENED_VALUE).toArray();
+#endif
+			ensure(java.util.Arrays.equals(iArray, jArray), "! sorted arrays equal");
+		}
 
 
 		/* Now we take out of m everything, and check that it is empty. */
 
 		for(java.util.Iterator i=m.iterator(); i.hasNext();) { i.next(); i.remove();}
 
-		if (!m.isEmpty())  {
-			System.out.println("Error (" + seed + "): m is not empty (as it should be)");
-			System.exit(1);
-		}
+		ensure(m.isEmpty(), "Error (" + seed + "): m is not empty (as it should be)");
 
 #if KEY_CLASS_Integer || KEY_CLASS_Long
 		m = new OPEN_HASH_BIG_SET(n, f);
@@ -1292,32 +1500,30 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 			for (int j=0; j<10; j++) {
 				k++;
 				x = i+(r.nextInt() % 10)*p;
-				if (m.add(x) != t.add(KEY2OBJ(x)))
-					System.out.println("Error (" + seed + "): m and t differ on a key during torture-test insertion.");
+				ensure(m.add(x) == t.add(KEY2OBJ(x)), "Error (" + seed + "): m and t differ on a key during torture-test insertion.");
 			}
 		}
 
-		if (!m.equals(t)) System.out.println("Error (" + seed + "): !m.equals(t) after torture-test insertion");
-		if (!t.equals(m)) System.out.println("Error (" + seed + "): !t.equals(m) after torture-test insertion");
+		ensure(m.equals(t), "Error (" + seed + "): !m.equals(t) after torture-test insertion");;
+		ensure(t.equals(m), "Error (" + seed + "): !t.equals(m) after torture-test insertion");;
 
 		for(int i=0; i<(p*f)/10; i++) {
 			for (int j=0; j<10; j++) {
 				x = i+(r.nextInt() % 10)*p;
-				if (m.remove(x) != t.remove(KEY2OBJ(x)))
-					System.out.println("Error (" + seed + "): m and t differ on a key during torture-test removal.");
+				ensure(m.remove(x) == t.remove(KEY2OBJ(x)), "Error (" + seed + "): m and t differ on a key during torture-test removal.");
 			}
 		}
 
-		if (!m.equals(t)) System.out.println("Error (" + seed + "): !m.equals(t) after torture-test removal");
-		if (!t.equals(m)) System.out.println("Error (" + seed + "): !t.equals(m) after torture-test removal");
+		ensure(m.equals(t), "Error (" + seed + "): !m.equals(t) after torture-test removal");;
+		ensure(t.equals(m), "Error (" + seed + "): !t.equals(m) after torture-test removal");;
 
-		if (!m.equals(m.clone())) System.out.println("Error (" + seed + "): !m.equals(m.clone()) after torture-test removal");
-		if (!((OPEN_HASH_BIG_SET)m.clone()).equals(m)) System.out.println("Error (" + seed + "): !m.clone().equals(m) after torture-test removal");
+		ensure(m.equals(m.clone()), "Error (" + seed + "): !m.equals(m.clone()) after torture-test removal");;
+		ensure(((OPEN_HASH_BIG_SET)m.clone()).equals(m), "Error (" + seed + "): !m.clone().equals(m) after torture-test removal");;
 
 		m.trim();
 
-		if (!m.equals(t)) System.out.println("Error (" + seed + "): !m.equals(t) after trim()");
-		if (!t.equals(m)) System.out.println("Error (" + seed + "): !t.equals(m) after trim()");
+		ensure(m.equals(t), "Error (" + seed + "): !m.equals(t) after trim()");;
+		ensure(t.equals(m), "Error (" + seed + "): !t.equals(m) after trim()");;
 
 #endif
 
@@ -1326,7 +1532,7 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 	}
 
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws Exception {
 		float f = Hash.DEFAULT_LOAD_FACTOR;
 		int n  = Integer.parseInt(args[1]);
 		if (args.length>2) f = Float.parseFloat(args[2]);
@@ -1338,6 +1544,7 @@ public class OPEN_HASH_BIG_SET KEY_GENERIC extends ABSTRACT_SET KEY_GENERIC impl
 		} catch(Throwable e) {
 			e.printStackTrace(System.err);
 			System.err.println("seed: " + seed);
+			throw e;
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2020 Sebastiano Vigna
+ * Copyright (C) 2002-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,10 @@ import java.util.SortedSet;
 import java.util.NoSuchElementException;
 #if KEYS_REFERENCE
 import java.util.Comparator;
+#endif
+#if KEYS_BYTE_CHAR_SHORT_FLOAT
+import WIDENED_PACKAGE.KEY_WIDENED_SPLITERATOR;
+import WIDENED_PACKAGE.WIDENED_SPLITERATORS;
 #endif
 
 
@@ -130,6 +134,7 @@ public final class SORTED_SETS {
 	 *
 	 * <p>This class may be useful to implement your own in case you subclass
 	 * a type-specific sorted set.
+	 *
 	 */
 
 	public static class Singleton KEY_GENERIC extends SETS.Singleton KEY_GENERIC implements SORTED_SET KEY_GENERIC, java.io.Serializable, Cloneable {
@@ -143,7 +148,7 @@ public final class SORTED_SETS {
 			this.comparator = comparator;
 		}
 
-		private Singleton(final KEY_GENERIC_TYPE element) {
+		Singleton(final KEY_GENERIC_TYPE element) {
 			this(element, null);
 		}
 
@@ -161,6 +166,9 @@ public final class SORTED_SETS {
 
 		@Override
 		public KEY_COMPARATOR KEY_SUPER_GENERIC comparator() { return comparator; }
+
+		@Override
+		public KEY_SPLITERATOR KEY_GENERIC spliterator() { return SPLITERATORS.singleton(element, comparator); }
 
 		@Override
 		SUPPRESS_WARNINGS_KEY_UNCHECKED
@@ -181,6 +189,15 @@ public final class SORTED_SETS {
 		public KEY_GENERIC_TYPE LAST() { return element; }
 
 #if KEYS_PRIMITIVE
+#if KEYS_BYTE_CHAR_SHORT_FLOAT
+		@Override
+		public KEY_WIDENED_SPLITERATOR KEY_WIDENED_SPLITERATOR_METHOD() {
+			return WIDENED_SPLITERATORS.singleton(
+				element,
+				(KEY_TYPE_WIDENED left, KEY_TYPE_WIDENED right) -> comparator().compare(KEY_NARROWING(left), KEY_NARROWING(right)));
+		}
+#endif
+
 		/** {@inheritDoc}
 		 * @deprecated Please use the corresponding type-specific method instead. */
 		@Deprecated
@@ -439,7 +456,7 @@ public final class SORTED_SETS {
 
 
 
-#if defined(TEST) && ! KEY_CLASS_Reference
+#if defined(TEST) && ! KEYS_USE_REFERENCE_EQUALITY
 
 	private static KEY_TYPE genKey() {
 #if KEY_CLASS_Byte || KEY_CLASS_Short || KEY_CLASS_Character
@@ -452,7 +469,7 @@ public final class SORTED_SETS {
 	}
 
 
-	protected static void testSets(KEY_TYPE k, SORTED_SET m, SortedSet t, int level) {
+	protected static void testSets(KEY_TYPE k, SORTED_SET m, SortedSet t, int level) throws Exception {
 		int n = 100;
 		int c;
 
@@ -682,7 +699,7 @@ public final class SORTED_SETS {
 
 		SORTED_SET m2 = null;
 
-		try {
+		{
 			java.io.File ff = new java.io.File("it.unimi.dsi.fastutil.test." + m.getClass().getSimpleName() + "." + n);
 			java.io.OutputStream os = new java.io.FileOutputStream(ff);
 			java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(os);
@@ -697,12 +714,8 @@ public final class SORTED_SETS {
 			ois.close();
 			ff.delete();
 		}
-		catch(Exception e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
 
-#if ! KEY_CLASS_Reference
+#if ! KEYS_USE_REFERENCE_EQUALITY
 
 		ensure(m2.hashCode() == h, "Error (" + level + ", " + seed + "): hashCode() changed after save/read");
 
@@ -742,7 +755,7 @@ public final class SORTED_SETS {
 		return;
 	}
 
-	private static void test() {
+	private static void test() throws Exception {
 		KEY_TYPE k = genKey();
 		Singleton m = new Singleton(k);
 		SortedSet u = new java.util.TreeSet();
@@ -764,8 +777,7 @@ public final class SORTED_SETS {
 	}
 
 	private static void fatal(String msg) {
-		System.out.println(msg);
-		System.exit(1);
+		throw new AssertionError(msg);
 	}
 
 	private static void ensure(boolean cond, String msg) {
@@ -784,6 +796,7 @@ public final class SORTED_SETS {
 		} catch(Throwable e) {
 			e.printStackTrace(System.err);
 			System.err.println("seed: " + seed);
+			throw e;
 		}
 	}
 

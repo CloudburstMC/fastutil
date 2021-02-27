@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil.ints;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +14,8 @@ package it.unimi.dsi.fastutil.ints;
  * limitations under the License.
  */
 
+package it.unimi.dsi.fastutil.ints;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -24,7 +24,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import it.unimi.dsi.fastutil.HashCommon;
+import it.unimi.dsi.fastutil.MainRunner;
+import it.unimi.dsi.fastutil.ints.Int2IntMap.Entry;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 public class Int2IntOpenHashMapTest {
 	@SuppressWarnings("deprecation")
@@ -185,4 +188,42 @@ public class Int2IntOpenHashMapTest {
 		s.trim(2);
 		assertEquals(8, s.n);
 	}
+
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(Int2IntOpenHashMap.class, "test", /*num=*/"500", /*loadFactor=*/"0.75", /*seed=*/"383454");
+	}
+
+	@Test
+	public void testForEachRemaining() {
+		// This set of extremely contorted parameters is necessary to trigger the usage of wrapped
+		final Int2IntOpenHashMap m = new Int2IntOpenHashMap(0, .99f);
+		m.put(1, 1);
+		m.int2IntEntrySet().fastIterator().forEachRemaining(x -> {
+		});
+		m.put(0, 0);
+		m.int2IntEntrySet().fastIterator().forEachRemaining(x -> {
+		});
+
+		for (int i = 2; i < 1000; i++) m.put(i, i);
+
+		final ObjectIterator<Entry> it = m.int2IntEntrySet().fastIterator();
+		for (int i = 1; i < 990; i++) {
+			it.next();
+			it.remove();
+		}
+
+		it.forEachRemaining(x -> {
+		});
+	}
+
+	@Test
+	public void testForEach() {
+		final Int2IntOpenHashMap s = new Int2IntOpenHashMap();
+		for (int i = 0; i < 100; i++) s.put(i, i);
+		final int[] c = new int[1];
+		s.forEach((x, y) -> c[0] += x.intValue());
+		assertEquals((100 * 99) / 2, c[0]);
+	}
+
 }

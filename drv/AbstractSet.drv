@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2020 Sebastiano Vigna
+ * Copyright (C) 2002-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,11 @@ public abstract class ABSTRACT_SET KEY_GENERIC extends ABSTRACT_COLLECTION KEY_G
 
 		Set<?> s = (Set<?>) o;
 		if (s.size() != size()) return false;
+#if KEYS_PRIMITIVE
+		if (s instanceof SET) {
+			return containsAll((SET) s);
+		}
+#endif
 		return containsAll(s);
 	}
 

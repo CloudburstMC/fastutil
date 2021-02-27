@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil;
-
 /*
- * Copyright (C) 2010-2020 Sebastiano Vigna
+ * Copyright (C) 2010-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +13,8 @@ package it.unimi.dsi.fastutil;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package it.unimi.dsi.fastutil;
 
 import java.util.Collection;
 
@@ -37,7 +37,7 @@ public interface Size64 {
 	long size64();
 
 	/** Returns the size of this data structure, minimized with {@link Integer#MAX_VALUE}.
-	 * 
+	 *
 	 * <p>This default implementation follows the definition above, which is compatible
 	 * with {@link Collection#size()}.
 	 *
@@ -48,5 +48,28 @@ public interface Size64 {
 	@Deprecated
 	default int size() {
 		return (int)Math.min(Integer.MAX_VALUE, size64());
+	}
+
+	// This is here instead of in one of the Collection classes because this method does
+	// not change per type-specific, so there is no need to generate type-specific implementations
+	// of these methods that the JVM has to separately compile.
+	/** Returns the size for a given {@link Collection} as a {@code long}, using {@link #size64()}
+	 * if applicable, else using {@link Collection#size()}.
+	 *
+	 * @param c the collection whose size to get
+	 * @return the size
+	 */
+	public static long sizeOf(final Collection<?> c) {
+		return c instanceof Size64 ? ((Size64)c).size64() : c.size();
+	}
+
+	/** Returns the size for a given {@link java.util.Map} as a {@code long}, using {@link #size64()}
+	 * if applicable, else using {@link java.util.Map#size()}.
+	 *
+	 * @param m the map whose size to get
+	 * @return the size
+	 */
+	public static long sizeOf(final java.util.Map<?, ?> m) {
+		return m instanceof Size64 ? ((Size64)m).size64() : m.size();
 	}
 }

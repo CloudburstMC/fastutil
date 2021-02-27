@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2020 Paolo Boldi and Sebastiano Vigna
+ * Copyright (C) 2003-2021 Paolo Boldi and Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ public interface INDIRECT_PRIORITY_QUEUE extends IndirectPriorityQueue<KEY_CLASS
 
 	/** Returns the type-specific comparator associated with this queue.
 	 *
-	 * <p>Note that this specification strengthens the one given in {@link IndirectPriorityQueue}.
+	 * @apiNote Note that this specification strengthens the one given in {@link IndirectPriorityQueue}.
 	 *
 	 * @return the comparator associated with this queue.
 	 * @see IndirectPriorityQueue#comparator()

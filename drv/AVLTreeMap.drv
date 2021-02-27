@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2020 Sebastiano Vigna
+ * Copyright (C) 2002-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,21 @@
 
 package PACKAGE;
 
+#if ! KEYS_REFERENCE
 import it.unimi.dsi.fastutil.objects.AbstractObjectSortedSet;
 import it.unimi.dsi.fastutil.objects.ObjectBidirectionalIterator;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import it.unimi.dsi.fastutil.objects.ObjectSortedSet;
+#endif
 
+#if KEY_INDEX != VALUE_INDEX && !(KEYS_REFERENCE && VALUES_REFERENCE)
 import VALUE_PACKAGE.VALUE_COLLECTION;
 import VALUE_PACKAGE.VALUE_ABSTRACT_COLLECTION;
 import VALUE_PACKAGE.VALUE_ITERATOR;
+#if VALUES_PRIMITIVE
+import VALUE_PACKAGE.VALUE_LIST_ITERATOR;
+#endif
+#endif
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -31,9 +38,6 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.NoSuchElementException;
 
-#if VALUES_PRIMITIVE
-import VALUE_PACKAGE.VALUE_LIST_ITERATOR;
-#endif
 
 /** A type-specific AVL tree map with a fast, small-footprint implementation.
  *
@@ -190,7 +194,7 @@ public class AVL_TREE_MAP KEY_VALUE_GENERIC extends ABSTRACT_SORTED_MAP  KEY_VAL
 	 * all accessors.  They are (and should be maintained) identical to those used in AVLTreeSet.drv.
 	 *
 	 * The put()/remove() code is derived from Ben Pfaff's GNU libavl
-	 * (http://www.msu.edu/~pfaffben/avl/). If you want to understand what's
+	 * (https://adtinfo.org/). If you want to understand what's
 	 * going on, you should have a look at the literate code contained therein
 	 * first.
 	 */
@@ -292,8 +296,8 @@ public class AVL_TREE_MAP KEY_VALUE_GENERIC extends ABSTRACT_SORTED_MAP  KEY_VAL
 						after creation of the node.
 	*/
 	private Entry KEY_VALUE_GENERIC add(final KEY_GENERIC_TYPE k) {
-  	/* After execution of this method, modified is true iff a new entry has
-  	been inserted. */
+	/* After execution of this method, modified is true iff a new entry has
+	been inserted. */
 		modified = false;
 
 		Entry KEY_VALUE_GENERIC e = null;
@@ -1938,7 +1942,7 @@ public class AVL_TREE_MAP KEY_VALUE_GENERIC extends ABSTRACT_SORTED_MAP  KEY_VAL
 		return (VALUE_TYPE)(r.nextInt());
 #elif VALUES_PRIMITIVE
 		return r.NEXT_VALUE();
-#elif !VALUE_CLASS_Reference || KEY_CLASS_Reference
+#elif !VALUES_USE_REFERENCE_EQUALITY || KEYS_USE_REFERENCE_EQUALITY
 		return Integer.toBinaryString(r.nextInt());
 #else
 		return new java.io.Serializable() {};
@@ -2135,13 +2139,8 @@ public class AVL_TREE_MAP KEY_VALUE_GENERIC extends ABSTRACT_SORTED_MAP  KEY_VAL
 	}
 
 
-	private static boolean valEquals(Object o1, Object o2) {
-		return o1 == null ? o2 == null : o1.equals(o2);
-	}
-
 	private static void fatal(String msg) {
-		System.out.println(msg);
-		System.exit(1);
+		throw new AssertionError(msg);
 	}
 
 	private static void ensure(boolean cond, String msg) {
@@ -2161,13 +2160,13 @@ public class AVL_TREE_MAP KEY_VALUE_GENERIC extends ABSTRACT_SORTED_MAP  KEY_VAL
 		/* Now we check that m actually holds that data. */
 		for(Iterator i=t.entrySet().iterator(); i.hasNext();) {
 			java.util.Map.Entry e = (java.util.Map.Entry)i.next();
-			ensure(valEquals(e.getValue(), m.get(e.getKey())), "Error (" + level + ", " + seed + "): m and t differ on an entry ("+e+") after insertion (iterating on t)");
+			ensure(java.util.Objects.equals(e.getValue(), m.get(e.getKey())), "Error (" + level + ", " + seed + "): m and t differ on an entry ("+e+") after insertion (iterating on t)");
 		}
 
 		/* Now we check that m actually holds that data, but iterating on m. */
 		for(Iterator i=m.entrySet().iterator(); i.hasNext();) {
 			Entry e = (Entry)i.next();
-			ensure(valEquals(e.getValue(), t.get(e.getKey())), "Error (" + level + ", " + seed + "): m and t differ on an entry ("+e+") after insertion (iterating on m)");
+			ensure(java.util.Objects.equals(e.getValue(), t.get(e.getKey())), "Error (" + level + ", " + seed + "): m and t differ on an entry ("+e+") after insertion (iterating on m)");
 		}
 
 		/* Now we check that m actually holds the same keys. */
@@ -2207,7 +2206,7 @@ public class AVL_TREE_MAP KEY_VALUE_GENERIC extends ABSTRACT_SORTED_MAP  KEY_VAL
 	private static VALUE_TYPE vt[];
 	private static AVL_TREE_MAP topMap;
 
-	protected static void testMaps(SORTED_MAP m, SortedMap t, int n, int level) {
+	protected static void testMaps(SORTED_MAP m, SortedMap t, int n, int level) throws Exception {
 		long ms;
 		boolean mThrowsIllegal, tThrowsIllegal, mThrowsNoElement, tThrowsNoElement;
 		Object rt = null, rm = null;
@@ -2284,8 +2283,7 @@ public class AVL_TREE_MAP KEY_VALUE_GENERIC extends ABSTRACT_SORTED_MAP  KEY_VAL
 						! m.get(KEY2OBJ(T)).equals(t.get(KEY2OBJ(T))))
 #endif
 						{
-							System.out.println("Error (" + level + ", " + seed + "): divergence between t and m (polymorphic method)");
-							System.exit(1);
+							ensure(false, "Error (" + level + ", " + seed + "): divergence between t and m (polymorphic method)");
 						}
 			}
 		}
@@ -2311,7 +2309,7 @@ public class AVL_TREE_MAP KEY_VALUE_GENERIC extends ABSTRACT_SORTED_MAP  KEY_VAL
 
 			ensure(mThrowsNoElement == tThrowsNoElement, "Error (" + level + ", " + seed + "): get() divergence in NoSuchElementException for " + T + " (" + mThrowsNoElement + ", " + tThrowsNoElement + ")");
 			ensure(mThrowsIllegal == tThrowsIllegal, "Error (" + level + ", " + seed + "): get() divergence in IllegalArgumentException for " + T + " (" + mThrowsIllegal + ", " + tThrowsIllegal + ")");
-			if (!mThrowsNoElement && !mThrowsIllegal) ensure(valEquals(m.get(KEY2OBJ(T)), t.get(KEY2OBJ(T))), "Error (" + level + ", " + seed + "): divergence between t and m (standard method)");
+			if (!mThrowsNoElement && !mThrowsIllegal) ensure(java.util.Objects.equals(m.get(KEY2OBJ(T)), t.get(KEY2OBJ(T))), "Error (" + level + ", " + seed + "): divergence between t and m (standard method)");
 		}
 
 		/* Now we put and remove random data in m and t, checking that the result is the same. */
@@ -2337,7 +2335,7 @@ public class AVL_TREE_MAP KEY_VALUE_GENERIC extends ABSTRACT_SORTED_MAP  KEY_VAL
 
 			ensure(mThrowsNoElement == tThrowsNoElement, "Error (" + level + ", " + seed + "): put() divergence in NoSuchElementException for " + T + " (" + mThrowsNoElement + ", " + tThrowsNoElement + ")");
 			ensure(mThrowsIllegal == tThrowsIllegal, "Error (" + level + ", " + seed + "): put() divergence in IllegalArgumentException for " + T + " (" + mThrowsIllegal + ", " + tThrowsIllegal + ")");
-			if (!mThrowsNoElement && !mThrowsIllegal) ensure(valEquals(rm, rt), "Error (" + level + ", " + seed + "): divergence in put() between t and m (" + rt + ", " + rm + ")");
+			if (!mThrowsNoElement && !mThrowsIllegal) ensure(java.util.Objects.equals(rm, rt), "Error (" + level + ", " + seed + "): divergence in put() between t and m (" + rt + ", " + rm + ")");
 
 			T = genKey();
 
@@ -2359,7 +2357,7 @@ public class AVL_TREE_MAP KEY_VALUE_GENERIC extends ABSTRACT_SORTED_MAP  KEY_VAL
 
 			ensure(mThrowsNoElement == tThrowsNoElement, "Error (" + level + ", " + seed + "): remove() divergence in NoSuchElementException for " + T + " (" + mThrowsNoElement + ", " + tThrowsNoElement + ")");
 			ensure(mThrowsIllegal == tThrowsIllegal, "Error (" + level + ", " + seed + "): remove() divergence in IllegalArgumentException for " + T + " (" + mThrowsIllegal + ", " + tThrowsIllegal + ")");
-			if (!mThrowsNoElement && !mThrowsIllegal) ensure(valEquals(rm, rt), "Error (" + level + ", " + seed + "): divergence in remove() between t and m (" + rt + ", " + rm + ")");
+			if (!mThrowsNoElement && !mThrowsIllegal) ensure(java.util.Objects.equals(rm, rt), "Error (" + level + ", " + seed + "): divergence in remove() between t and m (" + rt + ", " + rm + ")");
 		}
 
 		compareMT(m, t, level, seed);
@@ -2440,7 +2438,7 @@ public class AVL_TREE_MAP KEY_VALUE_GENERIC extends ABSTRACT_SORTED_MAP  KEY_VAL
 
 		SORTED_MAP m2 = null;
 
-		try {
+		{
 			java.io.File ff = new java.io.File("it.unimi.dsi.fastutil.test." + m.getClass().getSimpleName() + "." + n);
 			java.io.OutputStream os = new java.io.FileOutputStream(ff);
 			java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(os);
@@ -2455,12 +2453,8 @@ public class AVL_TREE_MAP KEY_VALUE_GENERIC extends ABSTRACT_SORTED_MAP  KEY_VAL
 			ois.close();
 			ff.delete();
 		}
-		catch(Exception e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
 
-#if !VALUE_CLASS_Reference
+#if !VALUES_USE_REFERENCE_EQUALITY
 		ensure(m2.hashCode() == h, "Error (" + level + ", " + seed + "): hashCode() changed after save/read");
 
 		/* Now we check that m2 actually holds that data. */
@@ -2615,7 +2609,7 @@ public class AVL_TREE_MAP KEY_VALUE_GENERIC extends ABSTRACT_SORTED_MAP  KEY_VAL
 	}
 
 
-	private static void runTest(int n) {
+	private static void runTest(int n) throws Exception {
 		AVL_TREE_MAP m = new AVL_TREE_MAP();
 		SortedMap t = new java.util.TreeMap();
 		topMap = m;
@@ -2654,7 +2648,7 @@ public class AVL_TREE_MAP KEY_VALUE_GENERIC extends ABSTRACT_SORTED_MAP  KEY_VAL
 	}
 
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws Exception {
 		int n  = Integer.parseInt(args[1]);
 		if (args.length > 2) r = new java.util.Random(seed = Long.parseLong(args[2]));
 
@@ -2664,6 +2658,7 @@ public class AVL_TREE_MAP KEY_VALUE_GENERIC extends ABSTRACT_SORTED_MAP  KEY_VAL
 		} catch(Throwable e) {
 			e.printStackTrace(System.err);
 			System.err.println("seed: " + seed);
+			throw e;
 		}
 	}
 

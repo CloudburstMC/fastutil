@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2020 Sebastiano Vigna
+ * Copyright (C) 2002-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -217,7 +217,7 @@ public class AVL_TREE_SET KEY_GENERIC extends ABSTRACT_SORTED_SET KEY_GENERIC im
 	 * all accessors.  They are (and should be maintained) identical to those used in AVLTreeMap.drv.
 	 *
 	 * The add()/remove() code is derived from Ben Pfaff's GNU libavl
-	 * (http://www.msu.edu/~pfaffben/avl/). If you want to understand what's
+	 * (https://adtinfo.org/). If you want to understand what's
 	 * going on, you should have a look at the literate code contained therein
 	 * first.
 	 */
@@ -974,6 +974,7 @@ public class AVL_TREE_SET KEY_GENERIC extends ABSTRACT_SORTED_SET KEY_GENERIC im
 			return c;
 		}
 
+		@Override
 		public boolean equals(final Object o) {
 			if (!(o instanceof Entry)) return false;
 			Entry KEY_GENERIC_WILDCARD e = (Entry KEY_GENERIC_WILDCARD)o;
@@ -981,11 +982,12 @@ public class AVL_TREE_SET KEY_GENERIC extends ABSTRACT_SORTED_SET KEY_GENERIC im
 			return KEY_EQUALS(key, e.key);
 		}
 
+		@Override
 		public int hashCode() {
 			return KEY2JAVAHASH_NOT_NULL(key);
 		}
 
-
+		@Override
 		public String toString() {
 			return String.valueOf(key);
 		}
@@ -1712,8 +1714,7 @@ public class AVL_TREE_SET KEY_GENERIC extends ABSTRACT_SORTED_SET KEY_GENERIC im
 	}
 
 	private static void fatal(String msg) {
-		System.out.println(msg);
-		System.exit(1);
+		throw new AssertionError(msg);
 	}
 
 	private static void ensure(boolean cond, String msg) {
@@ -1726,7 +1727,7 @@ public class AVL_TREE_SET KEY_GENERIC extends ABSTRACT_SORTED_SET KEY_GENERIC im
 	private static KEY_TYPE nkt[];
 	private static AVL_TREE_SET topSet;
 
-	protected static void testSets(SORTED_SET m, SortedSet t, int n, int level) {
+	protected static void testSets(SORTED_SET m, SortedSet t, int n, int level) throws Exception {
 		long ms;
 		boolean mThrowsIllegal, tThrowsIllegal, mThrowsNoElement, tThrowsNoElement;
 		boolean rt = false, rm = false;
@@ -1941,7 +1942,7 @@ public class AVL_TREE_SET KEY_GENERIC extends ABSTRACT_SORTED_SET KEY_GENERIC im
 
 		SORTED_SET m2 = null;
 
-		try {
+		{
 			java.io.File ff = new java.io.File("it.unimi.dsi.fastutil.test." + m.getClass().getSimpleName() + "." + n);
 			java.io.OutputStream os = new java.io.FileOutputStream(ff);
 			java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(os);
@@ -1955,10 +1956,6 @@ public class AVL_TREE_SET KEY_GENERIC extends ABSTRACT_SORTED_SET KEY_GENERIC im
 			m2 = (SORTED_SET)ois.readObject();
 			ois.close();
 			ff.delete();
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-			System.exit(1);
 		}
 
 		ensure(m2.hashCode() == h, "Error (" + level + ", " + seed + "): hashCode() changed after save/read");
@@ -2098,7 +2095,7 @@ public class AVL_TREE_SET KEY_GENERIC extends ABSTRACT_SORTED_SET KEY_GENERIC im
 	}
 
 
-	private static void runTest(int n) {
+	private static void runTest(int n) throws Exception {
 		AVL_TREE_SET m = new AVL_TREE_SET();
 		SortedSet t = new java.util.TreeSet();
 		topSet = m;
@@ -2130,7 +2127,7 @@ public class AVL_TREE_SET KEY_GENERIC extends ABSTRACT_SORTED_SET KEY_GENERIC im
 	}
 
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws Exception {
 		int n  = Integer.parseInt(args[1]);
 		if (args.length > 2) r = new java.util.Random(seed = Long.parseLong(args[2]));
 
@@ -2141,6 +2138,7 @@ public class AVL_TREE_SET KEY_GENERIC extends ABSTRACT_SORTED_SET KEY_GENERIC im
 		} catch(Throwable e) {
 			e.printStackTrace(System.err);
 			System.err.println("seed: " + seed);
+			throw e;
 		}
 	}
 

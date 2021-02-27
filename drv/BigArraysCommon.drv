@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil;
-
 /*
- * Copyright (C) 2010-2020 Sebastiano Vigna
+ * Copyright (C) 2010-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +26,7 @@ package it.unimi.dsi.fastutil;
  *   without expressed or implied warranty.
  */
 
+package it.unimi.dsi.fastutil;
 
 import it.unimi.dsi.fastutil.longs.LongComparator;
 import it.unimi.dsi.fastutil.bytes.ByteBigArrays;
@@ -48,6 +47,8 @@ import it.unimi.dsi.fastutil.longs.LongArrays;
 import it.unimi.dsi.fastutil.floats.FloatArrays;
 import it.unimi.dsi.fastutil.doubles.DoubleArrays;
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
+import java.util.concurrent.atomic.AtomicIntegerArray;
+import java.util.concurrent.atomic.AtomicLongArray;
 
 import java.util.Random;
 
@@ -75,8 +76,7 @@ import java.util.Random;
  * <em>{@linkplain #segment(long) segment}</em> and an associated
  * <em>{@linkplain #displacement(long)
  * displacement}</em> into that segment. Access to single members happens by
- * means of accessors defined in the type-specific versions (see, e.g.,
- * {@link #get(int[][], long)} and
+ * means of accessors (see, e.g., {@link #get(int[][], long)} and
  * {@link #set(int[][], long, int)}), but you can also use the
  * methods {@link #segment(long)}/{@link #displacement(long)} to access entries
  * manually.
@@ -160,18 +160,23 @@ import java.util.Random;
  *
  * <p>
  * A literal big array can be easily created by using the suitable type-specific
- * {@code wrap()} method (e.g., {@link IntBigArrays#wrap(int[])}) around a
- * literal standard array. Alternatively, for very small arrays you can just
- * declare a literal array-of-array (e.g., <code>new int[][] { { 1, 2 } }</code>).
- * Be warned, however, that this can lead to creating illegal big arrays if
- * for some reason (e.g., stress testing) {@link #SEGMENT_SIZE} is set to a
- * value smaller than the inner array length.
+ * {@code wrap()} method (e.g., {@link BigArrays#wrap(int[])}) around a
+ * standard Java literal array.
+ *
+ * <h2>Atomic big arrays</h2>
+ *
+ * <p>Limited support is available for atomic big arrays of integers and longs, with a similar syntax. Atomic big arrays are
+ * arrays of instances of {@link java.util.concurrent.atomic.AtomicIntegerArray} or
+ * {@link java.util.concurrent.atomic.AtomicLongArray} of length {@link #SEGMENT_SIZE} (or less, for
+ * the last segment, as usual) and their size cannot be changed. Some methods from those classes are
+ * available in {@link BigArrays} for atomic big arrays (e.g.,
+ * {@link BigArrays#incrementAndGet(AtomicIntegerArray[], long)}).
  *
  * <h2>Big alternatives</h2>
  *
  * <p>
  * If you find the kind of &ldquo;bare hands&rdquo; approach to big arrays not
- * enough object-oriented, please use big lists based on big arrays (.e.g,
+ * enough object-oriented, please use big lists based on big arrays (e.g.,
  * {@link it.unimi.dsi.fastutil.ints.IntBigArrayBigList}). Big arrays follow the Java tradition of
  * considering arrays as a &ldquo;legal alien&rdquo;&mdash;something in-between
  * an object and a primitive type. This approach lacks the consistency of a full
@@ -245,6 +250,46 @@ public class BigArrays {
 	 */
 	public static long start(final int segment) {
 		return (long) segment << SEGMENT_SHIFT;
+	}
+
+	/**
+	 * Computes the nearest segment starting index of a given index.
+	 *
+	 * <p>This will either be {@code start(segment(index)} or {@code start(segment(index) + 1)},
+	 * whichever is closer, given the bounds can be respected. If neither segment start is within
+	 * the bounds, then the index is returned unmodified.
+	 *
+	 * <p>This method can be useful for operations that seek to align on the outer array's boundaries
+	 * when possible.
+	 *
+	 * @implSpec The current implementation is branch heavy and is thus not suitable for use in
+	 * inner loops. However, it should be fine for the recursive step, where split points are
+	 * computed.
+	 *
+	 * @param index
+	 *            an index into a big array.
+	 * @param min
+	 *            the minimum (inclusive) valid index of the big array in question
+	 * @param max
+	 *            the maximum (exclusive) valid index of the big array in question
+	 * @return the closest segment starting index to {@code index}
+	 * @since 8.5.0
+	 */
+	public static long nearestSegmentStart(final long index, final long min, final long max) {
+		// There probably is a less branchy, bit twiddly way to do this, but this is fine for now.
+		// This isn't going to be used in inner loops, only the recursive call.
+		final long lower = start(segment(index));
+		final long upper = start(segment(index) + 1);
+		if (upper >= max) {
+		    if (lower < min) {
+	        	return index;
+		    }
+		    return lower;
+		}
+		if (lower < min) return upper;
+		// Overflow avoiding midpoint computation
+		final long mid = lower + ((upper - lower) >> 1);
+		return index <= mid ? lower : upper;
 	}
 
 	/**
@@ -601,7 +646,6 @@ public class BigArrays {
 #undef KEY_CLASS_Long
 #include "src/it/unimi/dsi/fastutil/DoubleBigArraysFragment.h"
 #undef KEY_CLASS_Double
-#if SMALL_TYPES
 #include "src/it/unimi/dsi/fastutil/BooleanBigArraysFragment.h"
 #undef KEY_CLASS_Boolean
 #include "src/it/unimi/dsi/fastutil/ShortBigArraysFragment.h"
@@ -610,7 +654,6 @@ public class BigArrays {
 #undef KEY_CLASS_Character
 #include "src/it/unimi/dsi/fastutil/FloatBigArraysFragment.h"
 #undef KEY_CLASS_Float
-#endif
 #undef KEYS_PRIMITIVE
 #include "src/it/unimi/dsi/fastutil/ObjectBigArraysFragment.h"
 

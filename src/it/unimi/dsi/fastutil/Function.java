@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil;
-
 /*
- * Copyright (C) 2002-2020 Sebastiano Vigna
+ * Copyright (C) 2002-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +14,7 @@ package it.unimi.dsi.fastutil;
  * limitations under the License.
  */
 
+package it.unimi.dsi.fastutil;
 
 import java.util.function.IntToLongFunction;
 import java.util.function.IntUnaryOperator;
@@ -110,6 +109,23 @@ public interface Function<K,V> extends java.util.function.Function<K,V> {
 	 */
 
 	V get(Object key);
+
+	/**
+	 * Returns the value associated by this function to the specified key, or give the specified
+	 * value if not present.
+	 *
+	 * @param key the key.
+	 * @param defaultValue the default value to return if not present.
+	 * @return the corresponding value, or {@code defaultValue} if no value was present for the
+	 *         given key.
+	 * @see java.util.Map#getOrDefault(Object, Object)
+	 * @since 8.5.0
+	 */
+	default V getOrDefault(final Object key, final V defaultValue) {
+		final V value = get(key);
+		return (value != null || containsKey(key)) ? value : defaultValue;
+	}
+
 
 	/** Returns true if this function contains a mapping for the specified key.
 	 *

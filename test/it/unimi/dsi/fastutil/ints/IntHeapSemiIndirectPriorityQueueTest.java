@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil.ints;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +14,15 @@ package it.unimi.dsi.fastutil.ints;
  * limitations under the License.
  */
 
+package it.unimi.dsi.fastutil.ints;
+
 import static org.junit.Assert.assertArrayEquals;
 
 import java.util.Arrays;
 
 import org.junit.Test;
 
+import it.unimi.dsi.fastutil.MainRunner;
 import junit.framework.TestCase;
 
 public class IntHeapSemiIndirectPriorityQueueTest extends TestCase {
@@ -81,4 +82,8 @@ public class IntHeapSemiIndirectPriorityQueueTest extends TestCase {
 		assertArrayEquals(new int[] { 0, 1 }, front);
 	}
 
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(IntHeapSemiIndirectPriorityQueue.class, "test", /*num=*/"500", /*seed=*/"39384");
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2020 Sebastiano Vigna
+ * Copyright (C) 2002-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,30 +17,16 @@
 
 package PACKAGE;
 
+import java.util.Spliterator;
 import java.util.List;
+import static it.unimi.dsi.fastutil.Size64.sizeOf;
 
-#if ! KEY_CLASS_Reference
-
+#if ! KEYS_USE_REFERENCE_EQUALITY
 /** A type-specific {@link List}; provides some additional methods that use polymorphism to avoid (un)boxing.
  *
  * <p>Note that this type-specific interface extends {@link Comparable}: it is expected that implementing
  * classes perform a lexicographical comparison using the standard operator "less then" for primitive types,
  * and the usual {@link Comparable#compareTo(Object) compareTo()} method for objects.
- *
- * <p>Additionally, this interface strengthens {@link #listIterator()},
- * {@link #listIterator(int)} and {@link #subList(int,int)}.
- *
- * <p>Besides polymorphic methods, this interfaces specifies methods to copy into an array or remove contiguous
- * sublists. Although the abstract implementation of this interface provides simple, one-by-one implementations
- * of these methods, it is expected that concrete implementation override them with optimized versions.
- *
- * @see List
- */
-
-public interface LIST KEY_GENERIC extends List<KEY_GENERIC_CLASS>, Comparable<List<? extends KEY_GENERIC_CLASS>>, COLLECTION KEY_GENERIC {
-#else
-
-/** A type-specific {@link List}; provides some additional methods that use polymorphism to avoid (un)boxing.
  *
  * <p>Additionally, this interface strengthens {@link #iterator()}, {@link #listIterator()},
  * {@link #listIterator(int)} and {@link #subList(int,int)}. The former had been already
@@ -53,19 +39,89 @@ public interface LIST KEY_GENERIC extends List<KEY_GENERIC_CLASS>, Comparable<Li
  * @see List
  */
 
+public interface LIST KEY_GENERIC extends List<KEY_GENERIC_CLASS>, Comparable<List<? extends KEY_GENERIC_CLASS>>, COLLECTION KEY_GENERIC {
+#else
+/** A type-specific {@link List}; provides some additional methods that use polymorphism to avoid (un)boxing.
+ *
+ * <p>Additionally, this interface strengthens {@link #iterator()}, {@link #listIterator()},
+ * {@link #listIterator(int)} and {@link #subList(int,int)}. The former had been already
+ * strengthened upstream, but unfortunately {@link List} re-specifies it.
+ *
+ * <p>This interface specifies reference equality semantics (members will be compared equal with
+ * {@code ==} instead of {@link Object#equals(Object) equals}), which may result in breaks in contract
+ * if attempted to be used with non reference-equality semantics based {@link List}s. For example, a
+ * {@code aReferenceList.equals(aObjectList)} may return different a different result then
+ * {@code aObjectList.equals(aReferenceList)}, in violation of {@link Object#equals equals}'s contract
+ * requiring it being symmetric.
+ *
+ * <p>Besides polymorphic methods, this interfaces specifies methods to copy into an array or remove contiguous
+ * sublists. Although the abstract implementation of this interface provides simple, one-by-one implementations
+ * of these methods, it is expected that concrete implementation override them with optimized versions.
+ *
+ * @see List
+ */
 public interface LIST KEY_GENERIC extends List<KEY_GENERIC_CLASS>, COLLECTION KEY_GENERIC {
 #endif
 
 	/** Returns a type-specific iterator on the elements of this list.
 	 *
-	 * <p>Note that this specification strengthens the one given in {@link List#iterator()}.
+	 * @apiNote This specification strengthens the one given in {@link List#iterator()}.
 	 * It would not be normally necessary, but {@link java.lang.Iterable#iterator()} is bizarrily re-specified
 	 * in {@link List}.
+	 * <p>Also, this is generally the only {@code iterator} method subclasses should override.
 	 *
 	 * @return an iterator on the elements of this list.
 	 */
 	@Override
 	KEY_LIST_ITERATOR KEY_GENERIC iterator();
+
+	/** Returns a type-specific spliterator on the elements of this list.
+	 *
+	 * <p>List spliterators must report at least {@link Spliterator#SIZED} and {@link Spliterator#ORDERED}.
+	 *
+	 * <p>See {@link java.util.List#spliterator()} for more documentation on the requirements
+	 * of the returned spliterator.
+	 *
+	 * @apiNote This specification strengthens the one given in
+	 * {@link java.util.Collection#spliterator()}, which was already
+	 * strengthened in the corresponding type-specific class,
+	 * but was weakened by the fact that this interface extends {@link List}.
+	 * <p>Also, this is generally the only {@code spliterator} method subclasses should override.
+	 *
+	 * @implSpec The default implementation returns a late-binding spliterator (see
+	 * {@link Spliterator} for documentation on what binding policies mean).
+	 * <ul>
+	 * <li>For {@link java.util.RandomAccess RandomAccess} lists, this will return a spliterator
+	 * that calls the type-specific {@link #get(int)} method on the appropriate indexes.</li>
+	 * <li>Otherwise, the spliterator returned will wrap this instance's type specific {@link #iterator}.</li>
+	 * </ul>
+	 * <p>In either case, the spliterator reports {@link Spliterator#SIZED},
+	 * {@link Spliterator#SUBSIZED}, and {@link Spliterator#ORDERED}.
+	 *
+	 * @implNote As the non-{@linkplain java.util.RandomAccess RandomAccess} case is based on the
+	 * iterator, and {@link java.util.Iterator} is an inherently linear API, the returned
+	 * spliterator will yield limited performance gains when run in parallel contexts, as the
+	 * returned spliterator's {@link Spliterator#trySplit() trySplit()} will have linear runtime.
+	 * <p>For {@link java.util.RandomAccess RandomAccess} lists, the parallel performance should
+	 * be reasonable assuming {@link #get(int)} is truly constant time like {@link java.util.RandomAccess
+	 * RandomAccess} suggests. 
+	 *
+	 * @return {@inheritDoc}
+	 * @since 8.5.0
+	 */
+	@Override
+#if SPLITERATOR_ASSURE_OVERRIDE
+	abstract KEY_SPLITERATOR KEY_GENERIC spliterator();
+#else
+	default KEY_SPLITERATOR KEY_GENERIC spliterator() {
+		if (this instanceof java.util.RandomAccess) {
+			return new ABSTRACT_LIST.IndexBasedSpliterator KEY_GENERIC_DIAMOND(this, 0);
+		} else {
+			return SPLITERATORS.asSpliterator(
+				iterator(), sizeOf(this), SPLITERATORS.LIST_SPLITERATOR_CHARACTERISTICS);
+		}
+	}
+#endif
 
 	/** Returns a type-specific list iterator on the list.
 	 *
@@ -83,7 +139,7 @@ public interface LIST KEY_GENERIC extends List<KEY_GENERIC_CLASS>, COLLECTION KE
 
 	/** Returns a type-specific view of the portion of this list from the index {@code from}, inclusive, to the index {@code to}, exclusive.
 	 *
-	 * <p>Note that this specification strengthens the one given in {@link List#subList(int,int)}.
+	 * @apiNote This specification strengthens the one given in {@link List#subList(int,int)}.
 	 *
 	 * @see List#subList(int,int)
 	 */
@@ -155,7 +211,7 @@ public interface LIST KEY_GENERIC extends List<KEY_GENERIC_CLASS>, COLLECTION KE
 	 * <pre><code>
 	 * ListIterator iter = listIterator(index);
 	 * int i = 0;
-	 * while (i < length) {
+	 * while (i &lt; length) {
 	 *   iter.next();
 	 *   iter.set(a[offset + i++]);
 	 * }
@@ -210,20 +266,80 @@ public interface LIST KEY_GENERIC extends List<KEY_GENERIC_CLASS>, COLLECTION KE
 	 */
 	boolean addAll(int index, COLLECTION c);
 
-	/** Inserts all of the elements in the specified type-specific list into this type-specific list at the specified position (optional operation).
-	 * @see List#add(int,Object)
-	 */
-	boolean addAll(int index, LIST c);
-
-	/** Appends all of the elements in the specified type-specific list to the end of this type-specific list (optional operation).
-	 * @see List#add(int,Object)
-	 */
-	boolean addAll(LIST c);
-
 	/** Replaces the element at the specified position in this list with the specified element (optional operation).
 	 * @see List#set(int,Object)
 	 */
 	KEY_TYPE set(int index, KEY_TYPE k);
+
+	/**
+	 * Replaces each element of this list with the result of applying the
+	 * operator to that element. 
+	 * @param operator the operator to apply to each element.
+	 * @see java.util.List#replaceAll
+	 */
+	default void replaceAll(final METHOD_ARG_KEY_UNARY_OPERATOR operator) {
+		final KEY_LIST_ITERATOR iter = listIterator();
+		while(iter.hasNext()) {
+			iter.set(operator.KEY_OPERATOR_APPLY(iter.NEXT_KEY()));
+		}
+	}
+
+#if KEYS_INT_LONG_DOUBLE
+	// Because our primitive UnaryOperator interface extends both the JDK's primitive
+	// and object UnaryOperator interfaces, calling this method with it would be ambiguous.
+	// This overload exists to pass it to the proper primitive overload.
+	/**
+	 * Replaces each element of this list with the result of applying the
+	 * operator to that element. 
+	 *
+	 * <p><b>WARNING</b>: Overriding this method is almost always a mistake, as this
+	 * overload only exists to disambiguate. Instead, override the {@code replaceAll()} overload
+	 * that uses the JDK's primitive unary operator type (e.g. {@link java.util.function.IntUnaryOperator}).
+	 *
+	 * <p>If Java supported final default methods, this would be one, but sadly it does not.
+	 *
+	 * <p>If you checked and are overriding the version with {@code java.util.function.XUnaryOperator}, and
+	 * still see this warning, then your IDE is incorrectly conflating this method with the proper
+	 * method to override, and you can safely ignore this message.
+	 *
+	 * @param operator the operator to apply to each element
+	 * @see java.util.List#replaceAll
+	 * @since 8.5.0
+	 */
+	default void replaceAll(final KEY_UNARY_OPERATOR operator) {
+		replaceAll((METHOD_ARG_KEY_UNARY_OPERATOR) operator);
+	}
+
+#elif KEYS_BYTE_CHAR_SHORT_FLOAT
+	/**
+	 * Replaces each element of this list with the result of applying the
+	 * operator to that element, performing widening and narrowing primitive casts, 
+	 * until all elements have been processed or the action
+	 * throws an exception.
+	 *
+	 * @param operator the operator to apply to each element
+	 * @see java.util.List#replaceAll
+	 * @since 8.5.0
+	 * @implNote Unless the argument is type-specific, this method will introduce an intermediary
+	 *   lambda to perform widening and narrowing casts. Please use the type-specific overload to avoid this overhead.
+	 */
+	default void replaceAll(final JDK_PRIMITIVE_UNARY_OPERATOR operator) {
+		replaceAll(operator instanceof METHOD_ARG_KEY_UNARY_OPERATOR ? (METHOD_ARG_KEY_UNARY_OPERATOR) operator : x -> KEY_NARROWING(operator.JDK_PRIMITIVE_KEY_APPLY(x)));
+	}
+#endif
+
+	/** {@inheritDoc}
+	 * @deprecated Please use the corresponding type-specific method instead.
+	 */
+	@Deprecated
+	@Override
+	@SuppressWarnings("boxing")
+	default void replaceAll(final java.util.function.UnaryOperator<KEY_GENERIC_CLASS> operator) {
+		java.util.Objects.requireNonNull(operator);
+		// The instanceof and cast is required for performance. Without it, calls routed through this
+		// overload using a primitive consumer would go through the slow lambda.
+		replaceAll(operator instanceof METHOD_ARG_KEY_UNARY_OPERATOR ? (METHOD_ARG_KEY_UNARY_OPERATOR) operator : (METHOD_ARG_KEY_UNARY_OPERATOR) operator::apply);
+	}
 
 	/** Returns the element at the specified position in this list.
 	 * @see List#get(int)
@@ -315,7 +431,86 @@ public interface LIST KEY_GENERIC extends List<KEY_GENERIC_CLASS>, COLLECTION KE
 
 #endif
 
-#if defined KEY_COMPARATOR && KEYS_PRIMITIVE
+	/** Inserts all of the elements in the specified type-specific list into this type-specific list at the specified position (optional operation).
+	 * @apiNote This method exists only for the sake of efficiency: override are expected to use {@link #getElements}/{@link #addElements}.
+	 * @implSpec This method delegates to the one accepting a collection, but it might be implemented more efficiently.
+	 * @see List#addAll(int,Collection)
+	 */
+	default boolean addAll(int index, LIST KEY_EXTENDS_GENERIC l) {
+		return addAll(index, (COLLECTION KEY_EXTENDS_GENERIC) l);
+	}
+
+	/** Appends all of the elements in the specified type-specific list to the end of this type-specific list (optional operation).
+	 * @implSpec This method delegates to the index-based version, passing {@link #size()} as first argument.
+	 * @see List#addAll(Collection)
+	 */
+	default boolean addAll(LIST KEY_EXTENDS_GENERIC l) {
+		return addAll(size(), l);
+	}
+
+	/** Returns an immutable empty list.
+	 *
+	 * @return an immutable empty list.
+	 */
+	public static KEY_GENERIC LIST KEY_GENERIC of() {
+		// Returning ImmutableList.EMPTY instead of LISTS.EMPTY_LIST to make dimorphic call site.
+		// See https://github.com/vigna/fastutil/issues/183
+		return IMMUTABLE_LIST.of();
+	}
+
+	/** Returns an immutable list with the element given.
+	 *
+	 * @param e the element that the returned list will contain.
+	 * @return an immutable list containing {@code e}.
+	 */
+	public static KEY_GENERIC LIST KEY_GENERIC of(final KEY_GENERIC_TYPE e) {
+		return LISTS.singleton(e);
+	}
+
+	/** Returns an immutable list with the elements given.
+	 *
+	 * @param e0 the first element.
+	 * @param e1 the second element.
+	 * @return an immutable list containing {@code e0} and {@code e1}.
+	 */
+	public static KEY_GENERIC LIST KEY_GENERIC of(final KEY_GENERIC_TYPE e0, final KEY_GENERIC_TYPE e1) {
+		return IMMUTABLE_LIST.of(e0, e1);
+	}
+
+	/** Returns an immutable list with the elements given.
+	 *
+	 * @param e0 the first element.
+	 * @param e1 the second element.
+	 * @param e2 the third element.
+	 * @return an immutable list containing {@code e0}, {@code e1}, and {@code e2}.
+	 */
+	public static KEY_GENERIC LIST KEY_GENERIC of(final KEY_GENERIC_TYPE e0, final KEY_GENERIC_TYPE e1, final KEY_GENERIC_TYPE e2) {
+		return IMMUTABLE_LIST.of(e0, e1, e2);
+	}
+
+	/** Returns an immutable list with the elements given.
+	 *
+	 * <p>Note that this method does not perform a defensive copy.
+	 *
+	 * @param a a list of elements that will be used to initialize the immutable list.
+	 * @return an immutable list containing the elements of {@code a}.
+	 */
+	SUPPRESS_WARNINGS_KEY_UNCHECKED
+	SAFE_VARARGS
+	public static KEY_GENERIC LIST KEY_GENERIC of(final KEY_GENERIC_TYPE... a) {
+		switch(a.length) {
+			case 0:
+				return of();
+			case 1:
+				return of(a[0]);
+			// Add cases of 2 and 3 if we ever have special logic for those.
+			default:
+				// fall through
+		}
+		return IMMUTABLE_LIST.of(a);
+	}
+
+#if defined(KEY_COMPARATOR) && KEYS_PRIMITIVE
 	/** {@inheritDoc}
 	 * @deprecated Please use the corresponding type-specific method instead.
 	 */
@@ -334,7 +529,7 @@ public interface LIST KEY_GENERIC extends List<KEY_GENERIC_CLASS>, COLLECTION KE
 	 * {@link #toArray()}, sorts the array, then replaces all elements using the
 	 * {@link #setElements} function.
 	 *
-	 * @implNote It is possible for this method to call {@link #unstableSort} if it can
+	 * <p>It is possible for this method to call {@link #unstableSort} if it can
 	 * determine that the results of a stable and unstable sort are completely equivalent.
 	 * This means if you override {@link #unstableSort}, it should <em>not</em> call this
 	 * method unless you override this method as well.
@@ -401,9 +596,39 @@ public interface LIST KEY_GENERIC extends List<KEY_GENERIC_CLASS>, COLLECTION KE
 #if !KEYS_REFERENCE
 #error Assertion error: No KEY_COMPARATOR defined, but not a reference type.
 #endif
+
+	/** Sorts this list using a sort assured to be stable.
+	 *
+	 * <p>Pass {@code null} to sort using natural ordering.
+	 *
+	 * <p>Unless a subclass specifies otherwise, the results of the method if the list is
+	 * concurrently modified during the sort are unspecified.
+	 *
+	 * @implSpec The default implementation dumps the elements into an array using
+	 * {@link #toArray()}, sorts the array, then replaces all elements using the
+	 * {@link #setElements} function.
+	 *
+	 * @since 8.5.0
+	 */
+	@Override
+	SUPPRESS_WARNINGS_KEY_UNCHECKED
+	default void sort(final java.util.Comparator<? super KEY_GENERIC_CLASS> comparator) {
+		KEY_GENERIC_TYPE[] elements = (KEY_GENERIC_TYPE[])toArray();
+		// Current stableSort implementation delegates to java.util.Arrays.sort for reference types,
+		// so we aren't losing out on JDK's optimized Timsort.
+		if (comparator == null) {
+			ARRAYS.stableSort(elements);
+		} else {
+			ARRAYS.stableSort(elements, comparator);
+		}
+		setElements(elements);
+	}
+
 	/** Sorts this list using a sort not assured to be stable.
 	 * This differs from {@link List#sort(java.util.Comparator)} in that the results are
 	 * not assured to be stable, but may be a bit faster.
+	 *
+	 * <p>Pass {@code null} to sort using natural ordering.
 	 *
 	 * <p>Unless a subclass specifies otherwise, the results of the method if the list is
 	 * concurrently modified during the sort are unspecified.

@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +13,8 @@ package it.unimi.dsi.fastutil;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package it.unimi.dsi.fastutil;
 
 import static org.junit.Assert.assertTrue;
 
@@ -32,7 +32,7 @@ public class ArraysTest {
 		testMergeSort(x, 0, x.length);
 	}
 
-	private static void testMergeSort(final int x[], int from, int to) {
+	private static void testMergeSort(final int x[], final int from, final int to) {
 		Arrays.mergeSort(from, to, (k1, k2) -> Integer.compare(x[k1], x[k2]), (k1, k2) -> {
 			final int t = x[k1];
 			x[k1] = x[k2];
@@ -70,7 +70,7 @@ public class ArraysTest {
 		testQuickSort(x, 0, x.length);
 	}
 
-	private static void testQuickSort(final int x[], int from, int to) {
+	private static void testQuickSort(final int x[], final int from, final int to) {
 		Arrays.quickSort(from, to, (k1, k2) -> Integer.compare(x[k1], x[k2]), (k1, k2) -> {
 			final int t = x[k1];
 			x[k1] = x[k2];
@@ -108,7 +108,7 @@ public class ArraysTest {
 		testParallelQuickSort(x, 0, x.length);
 	}
 
-	private static void testParallelQuickSort(final int x[], int from, int to) {
+	private static void testParallelQuickSort(final int x[], final int from, final int to) {
 		Arrays.parallelQuickSort(from, to, (k1, k2) -> Integer.compare(x[k1], x[k2]), (k1, k2) -> {
 			final int t = x[k1];
 			x[k1] = x[k2];

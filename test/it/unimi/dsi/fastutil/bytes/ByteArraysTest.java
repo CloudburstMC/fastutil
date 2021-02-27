@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil.bytes;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +14,15 @@ package it.unimi.dsi.fastutil.bytes;
  * limitations under the License.
  */
 
+package it.unimi.dsi.fastutil.bytes;
+
 import static org.junit.Assert.assertTrue;
 
 import java.util.Random;
 
 import org.junit.Test;
+
+import it.unimi.dsi.fastutil.MainRunner;
 
 public class ByteArraysTest {
 
@@ -66,7 +68,7 @@ public class ByteArraysTest {
 
 	@Test
 	public void testRadixSort2() {
-		byte[][] d = new byte[2][];
+		final byte[][] d = new byte[2][];
 
 		d[0] = new byte[10];
 		for(int i = d[0].length; i-- != 0;) d[0][i] = (byte)(3 - i % 3);
@@ -107,7 +109,7 @@ public class ByteArraysTest {
 
 	@Test
 	public void testRadixSort() {
-		byte[][] t = { { 2, 1, 0, 4 } };
+		final byte[][] t = { { 2, 1, 0, 4 } };
 		ByteArrays.radixSort(t);
 		for(int i = t[0].length - 1; i-- != 0;) assertTrue(t[0][i] <= t[0][i + 1]);
 
@@ -115,7 +117,7 @@ public class ByteArraysTest {
 		ByteArrays.radixSort(t);
 		for(int i = t[0].length - 1; i-- != 0;) assertTrue(t[0][i] <= t[0][i + 1]);
 
-		byte[][] d = new byte[2][];
+		final byte[][] d = new byte[2][];
 
 		d[0] = new byte[10];
 		for(int i = d[0].length; i-- != 0;) d[0][i] = (byte)(3 - i % 3);
@@ -154,5 +156,11 @@ public class ByteArraysTest {
 		for(int i = d.length; i-- != 0;) d[1][i] = (byte)random.nextInt();
 		ByteArrays.radixSort(d);
 		for(int i = d[0].length - 1; i-- != 0;) assertTrue(Integer.toString(i) + ": <" + d[0][i] + ", " + d[1][i] + ">, <" + d[0][i + 1] + ", " +  d[1][i + 1] + ">", d[0][i] < d[0][i + 1] || d[0][i] == d[0][i + 1] && d[1][i] <= d[1][i + 1]);
+	}
+
+	
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(ByteArrays.class, "test", /*num=*/"1000", /*seed=*/"848747");
 	}
 }

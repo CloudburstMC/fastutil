@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil.doubles;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +14,20 @@ package it.unimi.dsi.fastutil.doubles;
  * limitations under the License.
  */
 
+package it.unimi.dsi.fastutil.doubles;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import it.unimi.dsi.fastutil.MainRunner;
+
 public class DoubleOpenHashSetTest {
 
 	@Test
 	public void testNaNs() {
-		DoubleOpenHashSet s = new DoubleOpenHashSet();
+		final DoubleOpenHashSet s = new DoubleOpenHashSet();
 		s.add(Double.NaN);
 		s.add(Double.NaN);
 		assertEquals(1, s.size());
@@ -33,10 +35,14 @@ public class DoubleOpenHashSetTest {
 
 	@Test
 	public void testZeros() {
-		DoubleOpenHashSet s = new DoubleOpenHashSet();
+		final DoubleOpenHashSet s = new DoubleOpenHashSet();
 		assertTrue(s.add(-0.0d));
 		assertTrue(s.add(+0.0d));
 		assertEquals(2, s.size());
 	}
 
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(DoubleOpenHashSet.class, "test", /*num=*/"500", /*loadFactor=*/"0.75", /*seed=*/"3838474");
+	}
 }

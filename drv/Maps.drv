@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2020 Sebastiano Vigna
+ * Copyright (C) 2002-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,20 @@
 
 package PACKAGE;
 
+#if ! KEYS_REFERENCE
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ObjectIterable;
+import it.unimi.dsi.fastutil.objects.ObjectSpliterator;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
+#endif
 
+#if KEY_INDEX != VALUE_INDEX && !(KEYS_REFERENCE && VALUES_REFERENCE)
 import VALUE_PACKAGE.VALUE_COLLECTION;
 import VALUE_PACKAGE.VALUE_COLLECTIONS;
 #if ! VALUE_CLASS_Object
 import VALUE_PACKAGE.VALUE_SETS;
+#endif
 #endif
 
 import java.util.Map;
@@ -74,7 +79,11 @@ public final class MAPS {
 	public static KEY_VALUE_GENERIC ObjectIterable<MAP.Entry KEY_VALUE_GENERIC> fastIterable(MAP KEY_VALUE_GENERIC map) {
 		final ObjectSet<MAP.Entry KEY_VALUE_GENERIC> entries = map.ENTRYSET();
 		return entries instanceof MAP.FastEntrySet ? new ObjectIterable<MAP.Entry KEY_VALUE_GENERIC>() {
+			@Override
 			public ObjectIterator<MAP.Entry KEY_VALUE_GENERIC> iterator() { return ((MAP.FastEntrySet KEY_VALUE_GENERIC)entries).fastIterator(); }
+			@Override
+			public ObjectSpliterator<MAP.Entry KEY_VALUE_GENERIC> spliterator() { return entries.spliterator(); } 
+			@Override
 			public void forEach(final Consumer<? super MAP.Entry KEY_VALUE_GENERIC> consumer) { ((MAP.FastEntrySet KEY_VALUE_GENERIC)entries).fastForEach(consumer); }
 		} : entries;
 	}
@@ -93,6 +102,17 @@ public final class MAPS {
 
 		@Override
 		public boolean containsValue(final VALUE_TYPE v) { return false; }
+
+#if KEYS_PRIMITIVE || VALUES_PRIMITIVE
+		@Deprecated
+#endif
+		@Override
+		public VALUE_GENERIC_CLASS getOrDefault(final Object key, final VALUE_GENERIC_CLASS defaultValue) { return defaultValue; }
+
+#if KEYS_PRIMITIVE || VALUES_PRIMITIVE
+		@Override
+		public VALUE_GENERIC_TYPE getOrDefault(final KEY_TYPE key, final VALUE_GENERIC_TYPE defaultValue) { return defaultValue; }
+#endif
 
 #if VALUES_PRIMITIVE
 		/** {@inheritDoc}
@@ -116,6 +136,9 @@ public final class MAPS {
 		SUPPRESS_WARNINGS_VALUE_UNCHECKED
 		@Override
 		public VALUE_COLLECTION VALUE_GENERIC values() { return VALUE_SETS.EMPTY_SET; }
+
+		@Override
+		public void forEach(final java.util.function.BiConsumer<? super KEY_GENERIC_CLASS, ? super VALUE_GENERIC_CLASS> consumer) { }
 
 		@Override
 		public Object clone() { return EMPTY_MAP; }
@@ -309,7 +332,7 @@ public final class MAPS {
 
 		@Override
 		public VALUE_COLLECTION VALUE_GENERIC values() {
-			synchronized(sync) { if (values == null) return VALUE_COLLECTIONS.synchronize(map.values(), sync); return values; }
+			synchronized(sync) { if (values == null) values = VALUE_COLLECTIONS.synchronize(map.values(), sync); return values; }
 		}
 
 		@Override
@@ -353,17 +376,17 @@ public final class MAPS {
 
 #ifdef JDK_PRIMITIVE_FUNCTION
 		@Override
-		public VALUE_GENERIC_TYPE COMPUTE_IF_ABSENT_JDK(final KEY_GENERIC_TYPE key, final JDK_PRIMITIVE_FUNCTION KEY_SUPER_GENERIC VALUE_EXTENDS_GENERIC mappingFunction) { synchronized(sync) { return map.COMPUTE_IF_ABSENT_JDK(key, mappingFunction); } }
+		public VALUE_GENERIC_TYPE computeIfAbsent(final KEY_GENERIC_TYPE key, final JDK_PRIMITIVE_FUNCTION KEY_SUPER_GENERIC VALUE_EXTENDS_GENERIC mappingFunction) { synchronized(sync) { return map.computeIfAbsent(key, mappingFunction); } }
 #endif
 
 #if KEYS_PRIMITIVE && VALUES_PRIMITIVE
 		@Override
-		public VALUE_GENERIC_TYPE COMPUTE_IF_ABSENT_NULLABLE(final KEY_GENERIC_TYPE key, final JDK_KEY_TO_GENERIC_FUNCTION<? extends VALUE_GENERIC_CLASS> mappingFunction) { synchronized(sync) { return map.COMPUTE_IF_ABSENT_NULLABLE(key, mappingFunction); } }
+		public VALUE_GENERIC_TYPE computeIfAbsentNullable(final KEY_GENERIC_TYPE key, final JDK_KEY_TO_GENERIC_FUNCTION<? extends VALUE_GENERIC_CLASS> mappingFunction) { synchronized(sync) { return map.computeIfAbsentNullable(key, mappingFunction); } }
 #endif
 
 #if KEYS_PRIMITIVE || VALUES_PRIMITIVE
 		@Override
-		public VALUE_GENERIC_TYPE COMPUTE_IF_ABSENT_PARTIAL(final KEY_GENERIC_TYPE key, final FUNCTION KEY_SUPER_GENERIC VALUE_EXTENDS_GENERIC mappingFunction) { synchronized(sync) { return map.COMPUTE_IF_ABSENT_PARTIAL(key, mappingFunction); } }
+		public VALUE_GENERIC_TYPE computeIfAbsent(final KEY_GENERIC_TYPE key, final FUNCTION KEY_SUPER_GENERIC VALUE_EXTENDS_GENERIC mappingFunction) { synchronized(sync) { return map.computeIfAbsent(key, mappingFunction); } }
 #endif
 
 		@Override
@@ -377,8 +400,8 @@ public final class MAPS {
 		}
 
 		@Override
-		public VALUE_GENERIC_TYPE MERGE(final KEY_GENERIC_TYPE key, final VALUE_GENERIC_TYPE value, final java.util.function.BiFunction<? super VALUE_GENERIC_CLASS, ? super VALUE_GENERIC_CLASS, ? extends VALUE_GENERIC_CLASS> remappingFunction) {
-			synchronized (sync) { return map.MERGE(key, value, remappingFunction); }
+		public VALUE_GENERIC_TYPE merge(final KEY_GENERIC_TYPE key, final VALUE_GENERIC_TYPE value, final java.util.function.BiFunction<? super VALUE_GENERIC_CLASS, ? super VALUE_GENERIC_CLASS, ? extends VALUE_GENERIC_CLASS> remappingFunction) {
+			synchronized (sync) { return map.merge(key, value, remappingFunction); }
 		}
 
 #if KEYS_PRIMITIVE || VALUES_PRIMITIVE
@@ -513,7 +536,7 @@ public final class MAPS {
 		public SET KEY_GENERIC keySet() { if (keys == null) keys = SETS.unmodifiable(map.keySet()); return keys; }
 
 		@Override
-		public VALUE_COLLECTION VALUE_GENERIC values() { if (values == null) return VALUE_COLLECTIONS.unmodifiable(map.values()); return values; }
+		public VALUE_COLLECTION VALUE_GENERIC values() { if (values == null) values = VALUE_COLLECTIONS.unmodifiable(map.values()); return values; }
 
 		@Override
 		public boolean isEmpty() { return map.isEmpty(); }
@@ -552,17 +575,17 @@ public final class MAPS {
 
 #ifdef JDK_PRIMITIVE_FUNCTION
 		@Override
-		public VALUE_GENERIC_TYPE COMPUTE_IF_ABSENT_JDK(final KEY_GENERIC_TYPE key, final JDK_PRIMITIVE_FUNCTION KEY_SUPER_GENERIC VALUE_EXTENDS_GENERIC mappingFunction) { throw new UnsupportedOperationException(); }
+		public VALUE_GENERIC_TYPE computeIfAbsent(final KEY_GENERIC_TYPE key, final JDK_PRIMITIVE_FUNCTION KEY_SUPER_GENERIC VALUE_EXTENDS_GENERIC mappingFunction) { throw new UnsupportedOperationException(); }
 #endif
 
 #if KEYS_PRIMITIVE && VALUES_PRIMITIVE
 		@Override
-		public VALUE_GENERIC_TYPE COMPUTE_IF_ABSENT_NULLABLE(final KEY_GENERIC_TYPE key, final JDK_KEY_TO_GENERIC_FUNCTION<? extends VALUE_GENERIC_CLASS> mappingFunction) { throw new UnsupportedOperationException(); }
+		public VALUE_GENERIC_TYPE computeIfAbsentNullable(final KEY_GENERIC_TYPE key, final JDK_KEY_TO_GENERIC_FUNCTION<? extends VALUE_GENERIC_CLASS> mappingFunction) { throw new UnsupportedOperationException(); }
 #endif
 
 #if KEYS_PRIMITIVE || VALUES_PRIMITIVE
 		@Override
-		public VALUE_GENERIC_TYPE COMPUTE_IF_ABSENT_PARTIAL(final KEY_GENERIC_TYPE key, final FUNCTION KEY_SUPER_GENERIC VALUE_EXTENDS_GENERIC mappingFunction) { throw new UnsupportedOperationException(); }
+		public VALUE_GENERIC_TYPE computeIfAbsent(final KEY_GENERIC_TYPE key, final FUNCTION KEY_SUPER_GENERIC VALUE_EXTENDS_GENERIC mappingFunction) { throw new UnsupportedOperationException(); }
 #endif
 
 		@Override
@@ -572,7 +595,7 @@ public final class MAPS {
 		public VALUE_GENERIC_TYPE COMPUTE(final KEY_GENERIC_TYPE key, final java.util.function.BiFunction<? super KEY_GENERIC_CLASS, ? super VALUE_GENERIC_CLASS, ? extends VALUE_GENERIC_CLASS> remappingFunction) { throw new UnsupportedOperationException(); }
 
 		@Override
-		public VALUE_GENERIC_TYPE MERGE(final KEY_GENERIC_TYPE key, final VALUE_GENERIC_TYPE value, final java.util.function.BiFunction<? super VALUE_GENERIC_CLASS, ? super VALUE_GENERIC_CLASS, ? extends VALUE_GENERIC_CLASS> remappingFunction) { throw new UnsupportedOperationException(); }
+		public VALUE_GENERIC_TYPE merge(final KEY_GENERIC_TYPE key, final VALUE_GENERIC_TYPE value, final java.util.function.BiFunction<? super VALUE_GENERIC_CLASS, ? super VALUE_GENERIC_CLASS, ? extends VALUE_GENERIC_CLASS> remappingFunction) { throw new UnsupportedOperationException(); }
 
 #if KEYS_PRIMITIVE || VALUES_PRIMITIVE
 		/** {@inheritDoc}

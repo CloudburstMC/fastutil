@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil.doubles;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +13,8 @@ package it.unimi.dsi.fastutil.doubles;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package it.unimi.dsi.fastutil.doubles;
 
 import static it.unimi.dsi.fastutil.BigArrays.copy;
 import static it.unimi.dsi.fastutil.BigArrays.get;
@@ -33,6 +33,7 @@ import java.util.Random;
 import org.junit.Test;
 
 import it.unimi.dsi.fastutil.BigArrays;
+import it.unimi.dsi.fastutil.MainRunner;
 
 public class DoubleBigArraysTest {
 
@@ -255,26 +256,13 @@ public class DoubleBigArraysTest {
 	}
 
 	@Test
-	public void testMergeSortNaNs() {
-		final double[] t = { Double.NaN, 1, 5, 2, 1, 0, 9, 1, Double.NaN, 2, 4, 6, 8, 9, 10, 12, 1, 7 };
-		for(int to = 1; to < t.length; to++)
-			for(int from = 0; from < to; from++) {
-				final double[] a = t.clone();
-				DoubleArrays.mergeSort(a, from, to);
-				for(int i = to - 1; i-- != from;) assertTrue(Double.compare(a[i], a[i + 1]) <= 0);
-			}
-
-	}
-
-
-	@Test
 	public void testRadixSortNaNs() {
 		final double[] t = { Double.NaN, 1, 5, 2, 1, 0, 9, 1, Double.NaN, 2, 4, 6, 8, 9, 10, 12, 1, 7 };
 		for(int to = 1; to < t.length; to++)
 			for(int from = 0; from < to; from++) {
-				final double[] a = t.clone();
-				DoubleBigArrays.radixSort(wrap(a), from, to);
-				for(int i = to - 1; i-- != from;) assertTrue(Double.compare(a[i], a[i + 1]) <= 0);
+				final double[][] a = wrap(t.clone());
+				DoubleBigArrays.radixSort(a, from, to);
+				for (int i = to - 1; i-- != from;) assertTrue(Double.compare(get(a, i), get(a, i + 1)) <= 0);
 			}
 
 	}
@@ -284,12 +272,12 @@ public class DoubleBigArraysTest {
 		final double[] t = { Double.NaN, 1, 5, 2, 1, 0, 9, 1, Double.NaN, 2, 4, 6, 8, 9, 10, 12, 1, 7 };
 		for(int to = 1; to < t.length; to++)
 			for(int from = 0; from < to; from++) {
-				final double[] a = t.clone();
-				final double[] b = t.clone();
-				DoubleBigArrays.radixSort(wrap(a), wrap(b), from, to);
+				final double[][] a = wrap(t.clone());
+				final double[][] b = wrap(t.clone());
+				DoubleBigArrays.radixSort(a, b, from, to);
 				for(int i = to - 1; i-- != from;) {
-					assertTrue(Double.compare(a[i], a[i + 1]) <= 0);
-					assertTrue(Double.compare(b[i], b[i + 1]) <= 0);
+					assertTrue(Double.compare(get(a, i), get(a, i + 1)) <= 0);
+					assertTrue(Double.compare(get(b, i), get(b, i + 1)) <= 0);
 				}
 			}
 
@@ -300,12 +288,15 @@ public class DoubleBigArraysTest {
 		final double[] t = { Double.NaN, 1, 5, 2, 1, 0, 9, 1, Double.NaN, 2, 4, 6, 8, 9, 10, 12, 1, 7 };
 		for(int to = 1; to < t.length; to++)
 			for(int from = 0; from < to; from++) {
-				final double[] a = t.clone();
-				DoubleBigArrays.quickSort(wrap(a), from, to);
-				for(int i = to - 1; i-- != from;) assertTrue(Double.compare(a[i], a[i + 1]) <= 0);
+				final double[][] a = wrap(t.clone());
+				DoubleBigArrays.quickSort(a, from, to);
+				for (int i = to - 1; i-- != from;) assertTrue(Double.compare(get(a, i), get(a, i + 1)) <= 0);
 			}
 
 	}
 
-
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(DoubleBigArrays.class, "test", /*num=*/"10000", /*seed=*/"293843");
+	}
 }

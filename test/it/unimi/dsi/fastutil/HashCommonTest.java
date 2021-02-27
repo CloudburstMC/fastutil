@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +14,7 @@ package it.unimi.dsi.fastutil;
  * limitations under the License.
  */
 
+package it.unimi.dsi.fastutil;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -25,7 +24,7 @@ import org.junit.Test;
 public class HashCommonTest {
 	@Test
 	public void testMaxFillSmall() {
-		for(float f: new float[] { 0.0001f, .25f, .50f, .75f, .9999f }) {
+		for(final float f: new float[] { 0.0001f, .25f, .50f, .75f, .9999f }) {
 			for(int i = 0; i < 16; i++) {
 				final int n = HashCommon.arraySize(i, f);
 				final int maxFill = HashCommon.maxFill(n, f);

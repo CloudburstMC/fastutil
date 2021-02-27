@@ -11,11 +11,11 @@
     footprint and fast access and insertion; provides also big (64-bit) arrays, sets and lists, and
     fast, practical I/O classes for binary and text files. It is
     free software
-    distributed under the <a HREF="http://www.apache.org/licenses/liCENSE-2.0.html">Apache License 2.0</a>.
+    distributed under the <a HREF="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License 2.0</a>.
 
 
 
-    <h2>Package Specification</h2>
+    <h1>Package Specification</h1>
 
     <p><code>fastutil</code> is formed by three cores:
     <ul>
@@ -26,30 +26,18 @@
     </ul>
     <p>The three cores are briefly introduced in the next sections, and then discussed at length in the rest of this overview.
 
+    <p>The following features were added in version 8.5.0:
 
-    <h3><code>fastutil</code> 8 at a glance</h3>
+	<ul>
+	<li>type-specific {@linkplain java.util.Spliterator spliterators};
+	<li>primitive {@linkplain java.util.stream.Stream stream} methods;
+	<li>even more default methods overridden for performance or avoiding boxing/unboxing.
+	</ul>
 
-    <p>This is a section for previous <code>fastutil</code> users who would like to skim quickly through the new features:
-    <ul>
-    <li>Java 8+ release.
-    <li>Type-specific versions of Java 8's new {@link java.util.Iterator} and {@link java.util.Map} methods, with default methods
-    and full support in wrapper classes (synchronized, etc.).
-    <li><code>fastutil</code>'s {@link it.unimi.dsi.fastutil.Function} extends JDK's {@link java.util.function.Function} and
-    type-specific functions extend corresponding JDK primitive functions, using key widening where applicable (e.g.,
-    {@link it.unimi.dsi.fastutil.shorts.Short2IntFunction} extends {@link java.util.function.IntUnaryOperator}).
-    <li>Type-specific versions of {@link java.util.function.Consumer}.
-    <li>Clean-up of all deprecated methods.
-    <li>Many abstract classes have been made obsolete by default methods in the associated interfaces, and are now deprecated.
-    <li>Type-specific {@linkplain java.util.Comparator comparators}, {@linkplain it.unimi.dsi.fastutil.Function functions},
-    {@linkplain java.util.function.Consumer consumers} and ({@linkplain it.unimi.dsi.fastutil.BigSwapper big})
-    {@linkplain it.unimi.dsi.fastutil.Swapper swappers} can be defined using lambda expressions.
-    <li>Easy ways to exploit fast iterators for maps, even in for loops, using methods such
-    as {@link it.unimi.dsi.fastutil.ints.Int2IntMaps#fastIterable(it.unimi.dsi.fastutil.ints.Int2IntMap)}.
-    <li>Structures based on hash tables never rehash below the size specified at construction time.
-    </ul>
+	<p>We <strong>strongly suggest</strong> to activate deprecation warnings in your development environment, as <code>fastutil</code>
+	systematically deprecates all JDK methods for which there is a type-specific alternative.
 
-
-    <h3>Type-specific classes</h3>
+    <h2>Type-specific classes</h2>
 
     <p><code>fastutil</code> specializes the most useful {@link
     java.util.HashSet}, {@link java.util.HashMap}, {@link
@@ -76,7 +64,7 @@
     the class you need.
 
 
-    <h3>Support for very large collections</h3>
+    <h2>Support for very large collections</h2>
 
     <p>A set of classes makes it possible
     to handle very large collections: in particular, collections whose size exceeds
@@ -92,8 +80,9 @@
     {@link it.unimi.dsi.fastutil.BigArrays} and {@link it.unimi.dsi.fastutil.ints.IntBigArrays}
     to get an idea of the generic and type-specific methods available.
 
+	<p>Limited support is available for big atomic arrays of integers and longs.
 
-    <h3>Fast and practical I/O</h3>
+    <h2>Fast and practical I/O</h2>
 
     <code>fastutil</code> provides replacements for some standard classes of {@link java.io}
     that are plagued by a number of problems (see, e.g., {@link it.unimi.dsi.fastutil.io.FastBufferedInputStream}).
@@ -101,7 +90,7 @@
     containers contain dozens of methods that make it possible to load and save quickly
     (big) arrays to disks, to adapt binary and text file to iterators, and so on.
 
-    <h2>More on type-specific classes</h2>
+    <h1>More on type-specific classes</h1>
 
     <p>All data structures in <code>fastutil</code> extend their standard
     counterpart interface whenever possible (e.g., {@link java.util.Map} for maps). Thus, they
@@ -145,7 +134,7 @@
     it.unimi.dsi.fastutil.chars.CharOpenHashSet#CharOpenHashSet(CharIterator)
     use the right constructor}. And so on.
 
-    <h3>The Names</h3>
+    <h2>The Names</h2>
 
     <p>In general, class names adhere to the general pattern</p>
 
@@ -218,7 +207,7 @@
     classes have been gathered in {@link it.unimi.dsi.fastutil}.
 
 
-    <h3>An In&ndash;Depth Look</h3>
+    <h2>An In&ndash;Depth Look</h2>
 
     <p>The following table summarizes the available interfaces and
     implementations. To get more information, you can look at a specific
@@ -237,15 +226,19 @@
     <tr><td>Function<td>AbstractFunction<td>
     <tr><td>Map<td>AbstractMap<td>OpenHashMap, OpenCustomHashMap, ArrayMap
     <tr><td>SortedMap<td>AbstractSortedMap<td>RBTreeMap, AVLTreeMap, LinkedOpenHashMap
-    <tr><td>List, BigList&dagger;<td>AbstractList, AbstractBigList<td>ArrayList, BigArrayBigList, ArrayFrontCodedList
+    <tr><td>List, BigList&dagger;<td>AbstractList, AbstractBigList<td>ArrayList, BigArrayBigList, ArrayFrontCodedList, ImmutableList
     <tr><td>PriorityQueue&dagger;<td><td>HeapPriorityQueue, ArrayPriorityQueue, ArrayFIFOQueue
     <tr><td>IndirectPriorityQueue&dagger;<td><td>HeapSemiIndirectPriorityQueue, HeapIndirectPriorityQueue, ArrayIndirectPriorityQueue
     <tr><td>Stack&dagger;<td><td>ArrayList
-    <tr><td>Iterator, BigListIterator&dagger;
+    <tr><td>Pair&dagger;<td><td>MutablePair, ImmutablePair
+    <tr><td>Iterator, BigListIterator&dagger;<td>Iterators.AbstractIndexBasedIterator
+    <tr><td>Spliterator<td>Spliterators.AbstractIndexBasedSpliterator
     <tr><td>Comparator
     <tr><td>BidirectionalIterator&dagger;
     <tr><td>ListIterator
     <tr><td>Consumer
+    <tr><td>Predicate
+    <tr><td>BinaryOperator
     <tr><td>Size64&Dagger;
     </table>
     </div>
@@ -281,6 +274,8 @@
     <tr><td>IndirectPriorityQueues&dagger;
     <tr><td>Iterators
     <tr><td>BigListIterators
+    <tr><td>Spliterators
+    <tr><td>BigSpliterators
     <tr><td>Comparators
     <tr><td>Hash&Dagger;
     <tr><td>HashCommon&Dagger;
@@ -298,7 +293,7 @@
     {@linkplain it.unimi.dsi.fastutil.ints.Int2IntMaps#singleton(int,int) singletons}.
 
 
-    <h3>Warnings</h3>
+    <h2>Warnings</h2>
 
     <p><strong>All classes are not synchronized</strong>. If multiple threads
     access one of these classes concurrently, and at least one of the threads
@@ -331,7 +326,7 @@
     IntRBTreeSet()).tailSet(1).tailSet(0)} won't.
 
 
-    <h3>Additional Features and Methods</h3>
+    <h2>Additional Features and Methods</h2>
 
     <p>The new interfaces add some very natural methods and strengthen many of
     the old ones. Moreover, whenever possible, the object returned is
@@ -365,6 +360,10 @@
     <code>fastutil</code> type you would expect, too.
 
     <li>Iterators returned by <code>iterator()</code> are type-specific.
+    
+    <li>Spliterators returned by <code>spliterator()</code> are type-specific.
+
+	<li>Collection has a method returning primitive streams, for example {@link it.unimi.dsi.fastutil.ints.IntCollection#intStream()}.  
 
     <li>Sorted structures in <code>fastutil</code> return
     type-specific {@linkplain
@@ -445,7 +444,12 @@
     it.unimi.dsi.fastutil.ints.IntIterator#nextInt()
     next<var>type</var>()} returning directly a primitive type.
     And, of course, you have a type-specific version of {@link
-    java.util.ListIterator#previous() previous()}.
+    java.util.ListIterator#previous() previous()}. Note that the &ldquo;for each&rdquo;
+	style of iteration can hide boxing and unboxing: even if you iterate
+	using a primitive variable (as in {@code for(long x: s)}, where {@code s}
+	is a {@link it.unimi.dsi.fastutil.longs.LongSet}), the actual iterator used will be
+	object-based, as Java knows nothing about <code>fastutil</code>'s
+	type-specific {@code next()}/{@code previous()} methods.
 
     <li>For the same reason, the method {@link java.util.Collection#toArray}
     as a polymorphic version accepting a type-specific array, but there is
@@ -456,7 +460,7 @@
     <li>The standard entry-set iterators for hash-based maps use an entry object
     that refers to the data contained in the hash table. If you retrieve an
     entry and delete it, the entry object will become invalid and will throw
-    an {@link java.util.ArrayIndexOutOfBounds} exception. This does not
+    an {@link java.lang.ArrayIndexOutOfBoundsException} exception. This does not
     apply to fast iterators (see above).</li>
 
     <li>A name clash between the list and collection interfaces
@@ -506,7 +510,7 @@
     </ul>
 
 
-    <h3>Functions</h3>
+    <h2>Functions</h2>
 
     {@link it.unimi.dsi.fastutil.Function} (and its type-specific versions) is an
     interface geared towards mathematical functions (e.g., hashes) which associates
@@ -519,7 +523,7 @@
     <p><code>fastutil</code>
     provides interfaces, abstract implementations and the usual array of wrappers
     in the suitable static container (e.g., {@link it.unimi.dsi.fastutil.ints.Int2IntFunctions}).
-    Implementations will be provided by other projects (e.g., <a href="http://sux.dsi.unimi.it/">Sux4J</a>).
+    Implementations will be provided by other projects (e.g., <a href="http://sux.di.unimi.it/">Sux4J</a>).
     Type-specific functions require just to define their {@code get()} methods: thus, they can be defined
     by lambda expressions.
 
@@ -533,7 +537,7 @@
     java.util.function.IntUnaryOperator}.
 
 
-    <h3>Static Container Classes</h3>
+    <h2>Static Container Classes</h2>
 
     <p><code>fastutil</code> provides a number of static methods and
     singletons, much like {@link java.util.Collections}. To avoid creating
@@ -599,7 +603,7 @@
     specifying whether the algorithm should be stable.
 
 
-    <h3>Iterators and Comparators</h3>
+    <h2>Iterators and Comparators</h2>
 
     <p><code>fastutil</code> provides type-specific iterators and
     comparators. The interface of a <code>fastutil</code> iterator is
@@ -628,9 +632,67 @@
     concatenate them} or {@linkplain
     it.unimi.dsi.fastutil.objects.ObjectIterators#pour(Iterator,ObjectCollection)
     pour them} into a set.
+    
+    <h2>Spliterators and Streams</h2>
+    <p><code>fastutil</code> provides type-specific {@linkplain java.util.Spliterator spliterators}. These are
+    used to implement fast streams.
+
+    <p>Due to Java only supporting primitive Streams of <code>int</code>, <code>long</code>,
+    and <code>double</code>,
+    types for primitives narrower then that (such as {@linkplain
+    it.unimi.dsi.fastutil.bytes.ByteCollection ByteCollection}) have methods
+    that expose a spliterator widening them to the type supported by the
+    Stream API. For example, {@linkplain it.unimi.dsi.fastutil.bytes.ByteCollection ByteCollection}
+    will have an {@link it.unimi.dsi.fastutil.bytes.ByteCollection#intSpliterator intSpliterator()}
+    method in addition to a <code>spliterator()</code> method that works in terms of
+    bytes.
+    
+    <p>Due to the incompatibility of object based {@linkplain java.util.stream.Stream streams} and the
+    primitive streams (such as {@link java.util.stream.IntStream}), the <code>stream()</code>
+    methods of the primitive containers could not be updated to return their
+    primitive equivalents. Instead, for primitive collections, a new method is
+    provided that exposes a primitive stream, and the object based stream method
+    is marked deprecated like the other boxing methods do.
+    For example, {@linkplain it.unimi.dsi.fastutil.bytes.ByteCollection},
+    {@linkplain it.unimi.dsi.fastutil.shorts.ShortCollection}, and
+    {@linkplain it.unimi.dsi.fastutil.ints.IntCollection} exposes an
+    {@link it.unimi.dsi.fastutil.ints.IntCollection#intStream() intStream()} method, which should
+    be used in preference to
+    <code>stream()</code> as it will not box and unbox.
+
+	<p>Since type-specific {@link java.util.stream.Collector collectors} would be
+	more than 700, <code>fastutil</code> implements basic collection
+	methods in each container (e.g., {@link
+	it.unimi.dsi.fastutil.ints.IntImmutableList#toList(java.util.stream.IntStream)
+	IntImmutableList.toList()}). These methods must be applied to a stream
+	to obtain a collection containing the output of the stream.
+    
+    <p>Similar to iterators, a raft of utility methods for type-specific spliterators are provided
+    (e.g. {@link it.unimi.dsi.fastutil.ints.IntSpliterators}).  Most of them are analogues of the
+    utilities in the type-specific <code>Iterators</code> class.
+    
+    <p>Currently no utility methods are provided for type-specific streams, as the
+    Java library's API already has good coverage for that (e.g. the static methods of
+    {@link java.util.stream.Stream} and their primitive equivalents, or classes such as
+    {@link java.util.stream.StreamSupport}).
 
 
-    <h3>Queues</h3>
+	<h2>Functions, Consumers, Predicates, and Operators</h2>
+
+	<p>Classes such as {@link java.util.function.IntBinaryOperator} were introduced in Java 8
+	to obtain performance improvements similar to those obtained by <code>fastutil</code>. Unfortunately,
+	the design of all these classes follows an opposite choice with respect to <code>fastutil</code>'s:
+	type-specific classes do not extend the generic ones. Moreover, type specificity is rather limited
+	(e.g., there are no short-specific classes). The fact that type-specific classes do not extend
+	generic ones makes it difficult to use lambdas, as often they are (rightly) considered
+	ambiguous by the compiler. The solution implemented in <code>fastutil</code> 8.5.0 is to have
+	an internal type-specific version of these interfaces which extends both the generic one
+	and the JDK type-specific one, allowing also for type widening (e.g., {@link it.unimi.dsi.fastutil.chars.CharConsumer}
+	extends {@link java.util.function.IntConsumer}). When definining lambdas, the compiler now
+	has a more specific type to choose (the type-specific <code>fastutil</code> interface), and
+	no ambiguity arises.
+
+    <h2>Queues</h2>
 
     <p><code>fastutil</code> offers two types of queues: <em>direct
     queues</em> and <em>indirect queues</em>. A direct queue offers type-specific method to {@linkplain
@@ -659,7 +721,7 @@
     {@linkplain it.unimi.dsi.fastutil.ints.IntArrayFIFOQueue FIFO queues}.
 
 
-    <h3>Custom Hashing</h3>
+    <h2>Custom Hashing</h2>
 
     <p>Sometimes, the behaviour of the built-in equality and hashing methods is
     not what you want. In particular, this happens if you store in a hash-based
@@ -670,7 +732,7 @@
     that <code>fastutil</code> containers do not cache hash codes, so custom hash strategies must be efficient.
 
 
-    <h3>Abstract Classes</h3>
+    <h2>Abstract Classes</h2>
 
     <p><code>fastutil</code> provides a wide range of abstract classes, to
     help in implementing its interfaces. They take care, for instance, of
@@ -681,7 +743,7 @@
 
 
 
-    <h2>More on the support for very large collections</h2>
+    <h1>More on the support for very large collections</h1>
 
     <p>With the continuous increase in core memory available, Java arrays are starting to show
     their size limitation (indices cannot be larger than 2<sup>31</sup>). <code>fastutil</code>
@@ -701,7 +763,7 @@
     as well as static containers (see, e.g., {@link it.unimi.dsi.fastutil.ints.IntBigLists}).
     Whereas it is unlikely that such collection will be in main memory as big arrays, there
     are number of situations, such as exposing large files through a list interface or
-    storing a large amount of data using <a href="http://sux4j.dsi.unimi.it/">succinct data structures</a>,
+    storing a large amount of data using <a href="http://sux4j.di.unimi.it/">succinct data structures</a>,
     in which a big list interface is natural.
 
     <p>Unfortunately, {@linkplain java.util.List lists} and {@linkplain it.unimi.dsi.fastutil.BigList big lists},
@@ -714,7 +776,7 @@
 
 
 
-    <h2>More on fast and practical I/O</h2>
+    <h1>More on fast and practical I/O</h1>
 
     <p><code>fastutil</code> includes an {@linkplain
     it.unimi.dsi.fastutil.io I/O package} that provides, for instance, {@linkplain
@@ -728,7 +790,7 @@
 
 
 
-    <h2>Performance</h2>
+    <h1>Performance</h1>
 
     <p>The main reason behind <code>fastutil</code> is performance, both in
     time and in space. The relevant methods of type-specific hash maps and sets
@@ -768,13 +830,13 @@
     the same entry object, suitably mutated.
 
 
-    <h3>Memory Usage</h3>
+    <h2>Memory Usage</h2>
 
     <p>The absence of wrappers makes data structures in <code>fastutil</code>
     much smaller: even in the case of objects, however, data structures in
     <code>fastutil</code> try to be space-efficient.
 
-    <h4>Hash Tables</h4>
+    <h3>Hash Tables</h3>
 
     <p>To avoid memory waste, (unlinked) hash tables in
     <code>fastutil</code> keep no additional information about elements
@@ -794,7 +856,7 @@
     your virtual machine, JVM versions, CPU etc.
 
     <p>More precisely, when you ask for a map that will hold <var>n</var>
-    elements with load factor 0&nbsp;&lt;&nbsp;<var>f</var>&nbsp;&le;&nbsp;1,
+    elements with load factor 0&nbsp;&lt;&nbsp;<var>f</var>&nbsp;&lt;&nbsp;1,
     2<sup>&lceil;log <var>n</var>&nbsp;/&nbsp;<var>f</var>&rceil;</sup>
     entries are allocated. When the table is filled up beyond the load factor, it is rehashed
     doubling its size. When it is emptied below <em>one fourth</em> of the load factor, it
@@ -807,12 +869,12 @@
     2<sup>&lceil;log <var>n</var>&nbsp;/&nbsp;<var>f</var>&rceil;</sup> longs that is used to store link information. Each
     element records the next and previous element (packed together so to be more cache friendly).
 
-    <h4>Balanced Trees</h4>
+    <h3>Balanced Trees</h3>
 
     <p>The balanced trees implementation is also very parsimonious.
     <code>fastutil</code> is based on the excellent (and unbelievably well
     documented) code contained in Ben Pfaff's <a
-    href="http://www.msu.edu/~pfaffben/avl/">GNU libavl</a>, which describes in
+    href="https://adtinfo.org/">GNU libavl</a>, which describes in
     detail how to handle balanced trees with <em>threads</em>. Thus, the
     overhead per entry is two pointers and one integer, which compares well to
     three pointers plus one boolean of the standard tree maps. The trick is
@@ -828,11 +890,40 @@
 
 
 
-    <h2>An Example</h2>
+    <h1>Examples</h1>
 
-    <p>Suppose you want to store a sorted map from longs to integers. The first
-    step is to define a variable of the right interface, and assign it a new
-    tree map (say, of the AVL type):
+	<p>To store a set of longs, we can use a hash-based container:
+    <pre>
+LongSet s = new LongOpenHashSet();
+    </pre>
+	<p>Access methods avoid boxing and unboxing:
+    <pre>
+s.add(1);
+s.contains(2);
+    </pre>
+    <p>We can obtain a type-specific iterator on the elements of the set:
+    <pre>
+// Sum all elements
+long t = 0;
+for(LongIterator i = s.iterator(); i.hasNext();) t += i.nextLong();
+	</pre>
+	<p>Note that &ldquo;for each&rdquo; iteration must be avoided:
+    <pre>
+long t = 0;
+for(long x: s) t += x;
+	</pre>
+	<p>In the loop above, boxing and unboxing is happening (even if your IDE does not report it).
+	In some cases, a solution is to use a type-specific {@link java.util.Collection#forEach(java.util.function.Consumer) forEach()}:
+    <pre>
+// Print all elements
+s.forEach(x -&gt; System.out.println(x));
+	</pre>
+    <p>Or we can use <code>fastutil</code>'s type-specific version of Java 8's streams:
+    <pre>
+long t = m.longStream().sum();
+    </pre>
+
+    <p>Suppose instead you want to store a sorted map from longs to integers. We will use a tree of AVL type:
     <pre>
 Long2IntSortedMap m = new Long2IntAVLTreeMap();
     </pre>
@@ -856,6 +947,10 @@ LongBidirectionalIterator i = m.keySet().iterator();
 // Now we sum all keys
 long s = 0;
 while(i.hasNext()) s += i.nextLong();
+	</pre>
+    <p>Or we can use again <code>fastutil</code>'s type-specific version of Java 8's streams:
+    <pre>
+long s = m.longStream().sum();
     </pre>
     <p>We now generate a head map, and iterate bidirectionally over it starting
     from a given point:
@@ -874,8 +969,8 @@ Long2IntSortedMap m2 = Long2IntSortedMaps.synchronize(m1);
     <p>Linked maps are very flexible data structures which can be used to implement, for
     instance, queues whose content can be probed efficiently:
     <pre>
-// This map remembers insertion order (note that we are using the array-based constructor)
-IntSortedSet s = new IntLinkedOpenHashSet(new int[] { 4, 3, 2, 1 });
+// This map remembers insertion order.
+IntSortedSet s = new IntLinkedOpenHashSet.of(4, 3, 2, 1);
 s.firstInt(); // This method call will return 4
 s.lastInt(); // This method call will return 1
 s.contains(5); // This method will return false
@@ -892,10 +987,10 @@ int[] a = new int[] { 5, 1, 9 };
 IntIterator j = IntIterators.wrap(a); // This iterator will return 5, 1, 9.
 IntIterator k = IntIterators.concat(new IntIterator[] { i , j }); // This iterator will return 0, 1, ..., 9, 5, 1, 9
     </pre>
-    <p>It is easy to build sets and maps on the fly using the array-based
-    constructors:
+    <p>It is easy to build lists and sets on the fly using the {@code of} static factory methods.
+    For maps you can use the constructors that take key and value arrays (array based constructors for list and set exist too):
 <pre>
-IntSet s = new IntOpenHashSet(new int[] { 1, 2, 3 }); // This set will contain 1, 2, and 3
+IntSet s = IntOpenHashSet.of(1, 2, 3); // This set will contain 1, 2, and 3
 Char2IntMap m = new Char2IntRBTreeMap(new char[] { '@', '-' }, new int[] { 0, 1 }); // This map will map '@' to 0 and '-' to 1
 </pre>
     <p>Whenever you have some data structure, it is easy to serialize it in an
@@ -904,10 +999,17 @@ Char2IntMap m = new Char2IntRBTreeMap(new char[] { '@', '-' }, new int[] { 0, 1 
 BinIO.storeObject(s, "foo"); // This method call will save s in the file named "foo"
 TextIO.storeInts(s.intIterator(), "foo.txt"); // This method call will save the content of s in ASCII
 i = TextIO.asIntIterator("foo.txt"); // This iterator will parse the file and return the integers therein
+	</pre>
+	<p>Support for Java 8 primitive streams is included for primitive collections (e.g. {@code intStream}),
+	which will work in terms of primitives instead of boxing to wrapper types like the regular {@code stream} would do:
+	<pre>
+IntList l = IntList.of(2, 380, 1297);
+int lSum = l.intStream().sum();  // Will be 1679
+IntList lTransformed = IntArrayList.toList(l.intStream().map(i -&gt; i + 40)); // Will be 42, 420, 1337
     </pre>
     <p>You can sort arrays using type-specific comparators specified by lambda expressions (no boxing/unboxing here):
     <pre>
-IntArrays.quickSort(a, (x, y) -&gt; y - x); // Sorts in reverse order
+IntArrays.quickSort(a, (x, y) -&gt; Integer.compare(y,  x)); // Sorts in reverse order
     </pre>
     <p>You can also easily specify complex generic sorting, like sorting indirectly on {@code a} while swapping elements in {@code a} and {@code b} in parallel:
     <pre>

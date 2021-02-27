@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2020 Sebastiano Vigna
+ * Copyright (C) 2002-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,6 +155,10 @@ public final class BIG_LISTS {
 		public KEY_BIG_LIST_ITERATOR KEY_GENERIC listIterator(long i) { if (i == 0) return BIG_LIST_ITERATORS.EMPTY_BIG_LIST_ITERATOR; throw new IndexOutOfBoundsException(String.valueOf(i)); }
 
 		@Override
+		SUPPRESS_WARNINGS_KEY_UNCHECKED
+		public KEY_SPLITERATOR KEY_GENERIC spliterator() { return SPLITERATORS.EMPTY_SPLITERATOR; }
+
+		@Override
 		public BIG_LIST KEY_GENERIC subList(long from, long to) { if (from == 0 && to == 0) return this; throw new IndexOutOfBoundsException(); }
 
 		@Override
@@ -175,7 +179,7 @@ public final class BIG_LISTS {
 		@Override
 		public long size64() { return 0; }
 
-#if ! KEY_CLASS_Reference
+#if ! KEYS_USE_REFERENCE_EQUALITY
 		@Override
 		public int compareTo(final BigList<? extends KEY_GENERIC_CLASS> o) {
 			if (o == this) return 0;
@@ -241,6 +245,9 @@ public final class BIG_LISTS {
 		@Override
 		public boolean contains(final KEY_TYPE k) { return KEY_EQUALS(k, element); }
 
+		@Override
+		public long indexOf(final KEY_TYPE k) { return KEY_EQUALS(k, element) ? 0 : -1; }
+
 		/* Slightly optimized w.r.t. the one in ABSTRACT_SET. */
 
 		@Override
@@ -260,6 +267,9 @@ public final class BIG_LISTS {
 			if (i == 1) l.NEXT_KEY();
 			return l;
 		}
+
+		@Override
+		public KEY_SPLITERATOR KEY_GENERIC spliterator() { return SPLITERATORS.singleton(element); }
 
 		@Override
 		SUPPRESS_WARNINGS_KEY_UNCHECKED
@@ -416,7 +426,7 @@ public final class BIG_LISTS {
 		@Override
 		public int hashCode() { synchronized(sync) { return list.hashCode(); } }
 
-#if ! KEY_CLASS_Reference
+#if ! KEYS_USE_REFERENCE_EQUALITY
 		@Override
 		public int compareTo(final BigList<? extends KEY_GENERIC_CLASS> o) { synchronized(sync) { return list.compareTo(o); } }
 #endif
@@ -564,7 +574,7 @@ public final class BIG_LISTS {
 		@Override
 		public int hashCode() { return list.hashCode(); }
 
-#if ! KEY_CLASS_Reference
+#if ! KEYS_USE_REFERENCE_EQUALITY
 		@Override
 		public int compareTo(final BigList<? extends KEY_GENERIC_CLASS> o) { return list.compareTo(o); }
 #endif
@@ -773,7 +783,7 @@ public final class BIG_LISTS {
 	}
 
 
-	private static void testLists(KEY_TYPE k, BIG_LIST m, BIG_LIST t, int level) {
+	private static void testLists(KEY_TYPE k, BIG_LIST m, BIG_LIST t, int level) throws Exception {
 		int n = 100;
 		int c;
 
@@ -1102,7 +1112,7 @@ public final class BIG_LISTS {
 
 		BIG_LIST m2 = null;
 
-		try {
+		{
 			java.io.File ff = new java.io.File("it.unimi.dsi.fastutil.test." + m.getClass().getSimpleName() + "." + n);
 			java.io.OutputStream os = new java.io.FileOutputStream(ff);
 			java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(os);
@@ -1117,12 +1127,8 @@ public final class BIG_LISTS {
 			ois.close();
 			ff.delete();
 		}
-		catch(Exception e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
 
-#if ! KEY_CLASS_Reference
+#if ! KEYS_USE_REFERENCE_EQUALITY
 
 		ensure(m2.hashCode() == h, "Error (" + level + ", " + seed + "): hashCode() changed after save/read");
 
@@ -1138,7 +1144,7 @@ public final class BIG_LISTS {
 			//System.err.println("Checking subList from " + start + " to " + end + " (level=" + (level+1) + ")...");
 			testLists(k, m.subList(start, end), t.subList(start, end), level - 1);
 
-			ensure(m.equals(t), "Error (" + level + ", " + seed + m + t + "): ! m.equals(t) after subList");
+			ensure(m.equals(t), () -> "Error (" + level + ", " + seed + m + t + "): ! m.equals(t) after subList");
 			ensure(t.equals(m), "Error (" + level + ", " + seed + "): ! t.equals(m) after subList");
 
 		}
@@ -1146,7 +1152,7 @@ public final class BIG_LISTS {
 		return;
 	}
 
-	private static void test() {
+	private static void test() throws Exception {
 		KEY_TYPE k = genKey();
 		BIG_LIST m = new Singleton(k);
 		BIG_LIST u = BIG_LISTS.unmodifiable(BIG_LISTS.asBigList(LISTS.singleton(KEY2OBJ(k))));
@@ -1166,13 +1172,17 @@ public final class BIG_LISTS {
 	}
 
 	private static void fatal(String msg) {
-		System.out.println(msg);
-		System.exit(1);
+		throw new AssertionError(msg);
 	}
 
 	private static void ensure(boolean cond, String msg) {
 		if (cond) return;
 		fatal(msg);
+	}
+
+	private static void ensure(boolean cond, java.util.function.Supplier<String> msgSupplier) {
+		if (cond) return;
+		fatal(msgSupplier.get());
 	}
 
 	/** This method expects as first argument a lower-cased type (e.g., "int"),
@@ -1186,6 +1196,7 @@ public final class BIG_LISTS {
 		} catch(Throwable e) {
 			e.printStackTrace(System.err);
 			System.err.println("seed: " + seed);
+			throw e;
 		}
 	}
 

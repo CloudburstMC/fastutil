@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2020 Sebastiano Vigna
+ * Copyright (C) 2002-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,24 @@
 
 package PACKAGE;
 
-/**  An abstract class facilitating the creation of type-specific iterators.
+/** An abstract class facilitating the creation of type-specific iterators.
  *
- * @deprecated As of fastutil 8 this class is no longer necessary, as its previous abstract
- * methods are now default methods of the type-specific interface.
+ * @apiNote Up to version 8.5.0, this class was deprecated as abstract methods were
+ * turned into default methods of the type-specific interface. Now the class hosts
+ * finalized versions of default delegating methods such as {@link #forEachRemaining}.
  */
 
-@Deprecated
 public abstract class KEY_ABSTRACT_ITERATOR KEY_GENERIC implements KEY_ITERATOR KEY_GENERIC {
 	protected KEY_ABSTRACT_ITERATOR() {}
+
+#if KEYS_INT_LONG_DOUBLE
+	/** {@inheritDoc} 
+	 * @implSpec This method just delegates to the interface default method,
+	 * as the default method, but it is final, so it cannot be overridden.
+	 */
+	@Override
+	public final void forEachRemaining(final KEY_CONSUMER action) {
+		forEachRemaining((JDK_PRIMITIVE_KEY_CONSUMER) action);
+	}
+#endif
 }

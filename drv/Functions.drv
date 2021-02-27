@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2020 Sebastiano Vigna
+ * Copyright (C) 2002-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,9 @@ public final class FUNCTIONS {
 
 		@Override
 		public VALUE_GENERIC_TYPE GET_VALUE(final KEY_TYPE k) { return VALUE_NULL; }
+
+		@Override
+		public VALUE_GENERIC_TYPE getOrDefault(final KEY_TYPE k, final VALUE_GENERIC_TYPE defaultValue) { return defaultValue; }
 
 		@Override
 		public boolean containsKey(final KEY_TYPE k) { return false; }
@@ -112,6 +115,9 @@ public final class FUNCTIONS {
 		public VALUE_GENERIC_TYPE GET_VALUE(final KEY_TYPE k) { return KEY_EQUALS(key, k) ? value : defRetValue; }
 
 		@Override
+		public VALUE_GENERIC_TYPE getOrDefault(final KEY_TYPE k, final VALUE_GENERIC_TYPE defaultValue) { return KEY_EQUALS(key, k) ? value : defaultValue; }
+
+		@Override
 		public int size() { return 1; }
 
 		@Override
@@ -173,7 +179,7 @@ public final class FUNCTIONS {
 
 #ifdef JDK_PRIMITIVE_FUNCTION
 
-#if KEY_WIDENED
+#if KEYS_BYTE_CHAR_SHORT_FLOAT
 		/** {@inheritDoc}
 		 * @deprecated Please use the corresponding type-specific method instead. */
 		@Deprecated
@@ -218,6 +224,9 @@ public final class FUNCTIONS {
 		public VALUE_GENERIC_TYPE GET_VALUE(final KEY_TYPE k) { synchronized(sync) { return function.GET_VALUE(k); } }
 
 		@Override
+		public VALUE_GENERIC_TYPE getOrDefault(final KEY_TYPE k, final VALUE_GENERIC_TYPE defaultValue) { synchronized(sync) { return function.getOrDefault(k, defaultValue); } }
+
+		@Override
 		public VALUE_GENERIC_TYPE REMOVE_VALUE(final KEY_TYPE k) { synchronized(sync) { return function.REMOVE_VALUE(k); } }
 
 		@Override
@@ -236,6 +245,12 @@ public final class FUNCTIONS {
 		@Deprecated
 		@Override
 		public VALUE_GENERIC_CLASS get(final Object k) { synchronized(sync) { return function.get(k); } }
+
+		/** {@inheritDoc}
+		 * @deprecated Please use the corresponding type-specific method instead. */
+		@Deprecated
+		@Override
+		public VALUE_GENERIC_CLASS getOrDefault(final Object k, final VALUE_GENERIC_CLASS defaultValue) { synchronized(sync) { return function.getOrDefault(k, defaultValue); } }
 
 		/** {@inheritDoc}
 		 * @deprecated Please use the corresponding type-specific method instead. */
@@ -314,6 +329,9 @@ public final class FUNCTIONS {
 		public VALUE_GENERIC_TYPE GET_VALUE(final KEY_TYPE k) { return function.GET_VALUE(k); }
 
 		@Override
+		public VALUE_GENERIC_TYPE getOrDefault(final KEY_TYPE k, final VALUE_GENERIC_TYPE defaultValue) { return function.getOrDefault(k, defaultValue); }
+
+		@Override
 		public VALUE_GENERIC_TYPE REMOVE_VALUE(final KEY_TYPE k) { throw new UnsupportedOperationException(); }
 
 		@Override
@@ -331,6 +349,12 @@ public final class FUNCTIONS {
 		@Deprecated
 		@Override
 		public VALUE_GENERIC_CLASS get(final Object k) { return function.get(k); }
+
+		/** {@inheritDoc}
+		 * @deprecated Please use the corresponding type-specific method instead. */
+		@Deprecated
+		@Override
+		public VALUE_GENERIC_CLASS getOrDefault(final Object k, final VALUE_GENERIC_CLASS defaultValue) { return function.getOrDefault(k, defaultValue); }
 
 		/** {@inheritDoc}
 		 * @deprecated Please use the corresponding type-specific method instead. */
@@ -398,6 +422,14 @@ public final class FUNCTIONS {
 		}
 
 		SUPPRESS_WARNINGS_KEY_UNCHECKED
+		@Override
+		public VALUE_GENERIC_TYPE getOrDefault(KEY_TYPE key, VALUE_GENERIC_TYPE defaultValue) {
+			VALUE_GENERIC_CLASS v = function.apply(KEY_GENERIC_CAST KEY2OBJ(key));
+			if (v == null) return defaultValue;
+			return VALUE_CLASS2TYPE(v);
+		}
+
+		SUPPRESS_WARNINGS_KEY_UNCHECKED
 		@Deprecated
 		@Override
 		public VALUE_GENERIC_CLASS get(Object key) {
@@ -405,6 +437,17 @@ public final class FUNCTIONS {
 			if (key == null) return null;
 #endif
 			return function.apply(KEY_CLASS_CAST key);
+		}
+
+		SUPPRESS_WARNINGS_KEY_UNCHECKED
+		@Deprecated
+		@Override
+		public VALUE_GENERIC_CLASS getOrDefault(Object key, VALUE_GENERIC_CLASS defaultValue) {
+#if KEYS_PRIMITIVE
+			if (key == null) return defaultValue;
+#endif
+			final VALUE_GENERIC_CLASS v;
+			return (v = function.apply(KEY_CLASS_CAST key)) == null ? defaultValue : v;
 		}
 
 		@Deprecated
@@ -433,7 +476,7 @@ public final class FUNCTIONS {
 #if defined JDK_PRIMITIVE_FUNCTION
 		if (f instanceof JDK_PRIMITIVE_FUNCTION)
 #if KEYS_PRIMITIVE
-#if VALUE_WIDENED
+#if VALUES_BYTE_CHAR_SHORT_FLOAT
 			return key -> VALUE_NARROWING(((JDK_PRIMITIVE_FUNCTION KEY_VALUE_GENERIC) f).JDK_PRIMITIVE_FUNCTION_APPLY(key));
 #else
 			return ((JDK_PRIMITIVE_FUNCTION KEY_VALUE_GENERIC) f)::JDK_PRIMITIVE_FUNCTION_APPLY;

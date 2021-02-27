@@ -1,5 +1,3 @@
-package it.unimi.dsi.fastutil.ints;
-
 /*
  * Copyright (C) 2017 Sebastiano Vigna
  *
@@ -15,11 +13,16 @@ package it.unimi.dsi.fastutil.ints;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package it.unimi.dsi.fastutil.ints;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+
+import it.unimi.dsi.fastutil.MainRunner;
 
 public class IntLinkedOpenCustomHashSetTest {
 
@@ -28,12 +31,12 @@ public class IntLinkedOpenCustomHashSetTest {
 		final IntLinkedOpenCustomHashSet s = new IntLinkedOpenCustomHashSet(new IntHash.Strategy() {
 
 			@Override
-			public int hashCode(int o) {
+			public int hashCode(final int o) {
 				return o % 10;
 			}
 
 			@Override
-			public boolean equals(int a, int b) {
+			public boolean equals(final int a, final int b) {
 				return (a - b) % 10 == 0;
 			}
 		});
@@ -60,5 +63,10 @@ public class IntLinkedOpenCustomHashSetTest {
 		assertEquals(10, i.nextInt());
 		assertFalse(i.hasNext());
 
+	}
+
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(IntLinkedOpenCustomHashSet.class, "test", /*num=*/"500", /*loadFactor=*/"0.75", /*seed=*/"383474");
 	}
 }

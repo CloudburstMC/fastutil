@@ -1,5 +1,3 @@
-package it.unimi.dsi.fastutil.ints;
-
 /*
  * Copyright (C) 2017 Sebastiano Vigna
  *
@@ -16,6 +14,8 @@ package it.unimi.dsi.fastutil.ints;
  * limitations under the License.
  */
 
+package it.unimi.dsi.fastutil.ints;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -28,6 +28,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import it.unimi.dsi.fastutil.Hash;
+import it.unimi.dsi.fastutil.MainRunner;
 
 @SuppressWarnings("rawtypes")
 /** Not a particularly good test, but it will check that we use everywhere the same hashing strategy. */
@@ -342,5 +343,10 @@ public class IntOpenCustomHashSetTest {
 		test(1000, Hash.DEFAULT_LOAD_FACTOR);
 		test(1000, Hash.FAST_LOAD_FACTOR);
 		test(1000, Hash.VERY_FAST_LOAD_FACTOR);
+	}
+
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(IntOpenCustomHashSet.class, "test", /*num=*/"500", /*loadFactor=*/"0.75", /*seed=*/"3834745");
 	}
 }

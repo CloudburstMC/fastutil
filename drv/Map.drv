@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2020 Sebastiano Vigna
+ * Copyright (C) 2002-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@
 
 package PACKAGE;
 
+#if KEY_INDEX != VALUE_INDEX && !(KEYS_REFERENCE && VALUES_REFERENCE)
 import VALUE_PACKAGE.VALUE_COLLECTION;
+#endif
 
-#if !KEY_CLASS_Object
+#if KEYS_PRIMITIVE
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 #endif
@@ -27,6 +29,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import java.util.function.Consumer;
 import java.util.Map;
 
+#if !KEYS_USE_REFERENCE_EQUALITY && !VALUES_USE_REFERENCE_EQUALITY
 /** A type-specific {@link Map}; provides some additional methods that use polymorphism to avoid (un)boxing, and handling of a default return value.
  *
  * <p>Besides extending the corresponding type-specific {@linkplain it.unimi.dsi.fastutil.Function function}, this interface strengthens {@link Map#entrySet()},
@@ -40,7 +43,28 @@ import java.util.Map;
  *
  * @see Map
  */
-
+#else
+/** A type-specific {@link Map}; provides some additional methods that use polymorphism to avoid (un)boxing, and handling of a default return value.
+ *
+ * <p>Besides extending the corresponding type-specific {@linkplain it.unimi.dsi.fastutil.Function function}, this interface strengthens {@link Map#entrySet()},
+ * {@link #keySet()} and {@link #values()}. Moreover, a number of methods, such as {@link #size()}, {@link #defaultReturnValue()}, etc., are un-defaulted
+ * as their function default do not make sense for a map.
+ * Maps returning entry sets of type {@link FastEntrySet} support also fast iteration.
+ *
+ * <p>This interface specifies reference equality semantics (members will be compared equal with
+ * {@code ==} instead of {@link Object#equals(Object) equals}) for its keys or values (or both), which may result in breaks in contract
+ * if attempted to be used with non reference-equality semantics based {@link Map}s. For example, a
+ * {@code aReferenceToIntMap.equals(aObjectToIntMap)} may return different a different result then
+ * {@code aObjectToIntMap.equals(aReferenceToIntMap)}, in violation of {@link Object#equals equals}'s
+ * contract requiring it being symmetric.
+ *
+ * <p>A submap or subset may or may not have an
+ * independent default return value (which however must be initialized to the
+ * default return value of the originator).
+ *
+ * @see Map
+ */
+#endif
 public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<KEY_GENERIC_CLASS,VALUE_GENERIC_CLASS> {
 
 	/** An entry set providing fast iteration.
@@ -148,7 +172,7 @@ public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<K
 
 #if KEYS_PRIMITIVE || VALUES_PRIMITIVE
 	/** Returns a set view of the mappings contained in this map.
-	 *  <p>Note that this specification strengthens the one given in {@link Map#entrySet()}.
+	 *  @apiNote Note that this specification strengthens the one given in {@link Map#entrySet()}.
 	 *
 	 * @return a set view of the mappings contained in this map.
 	 * @see Map#entrySet()
@@ -162,7 +186,7 @@ public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<K
 	}
 #else
 	/** Returns a set view of the mappings contained in this map.
-	 *  <p>Note that this specification strengthens the one given in {@link Map#entrySet()}.
+	 *  @apiNote Note that this specification strengthens the one given in {@link Map#entrySet()}.
 	 *
 	 * @return a set view of the mappings contained in this map.
 	 * @see Map#entrySet()
@@ -219,7 +243,7 @@ public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<K
 	}
 
 	/** {@inheritDoc}
-	 * <p>Note that this specification strengthens the one given in {@link Map#keySet()}.
+	 * @apiNote Note that this specification strengthens the one given in {@link Map#keySet()}.
 	 * @return a set view of the keys contained in this map.
 	 * @see Map#keySet()
 	 */
@@ -228,7 +252,7 @@ public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<K
 	SET KEY_GENERIC keySet();
 
 	/** {@inheritDoc}
-	 *  <p>Note that this specification strengthens the one given in {@link Map#values()}.
+	 * @apiNote Note that this specification strengthens the one given in {@link Map#values()}.
 	 * @return a set view of the values contained in this map.
 	 * @see Map#values()
 	 */
@@ -293,6 +317,26 @@ public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<K
 
 	// Defaultable methods
 
+	@Override
+	SUPPRESS_WARNINGS_KEY_VALUE_UNCHECKED
+	default void forEach(final java.util.function.BiConsumer<? super KEY_GENERIC_CLASS, ? super VALUE_GENERIC_CLASS> consumer) {
+		final ObjectSet<MAP.Entry KEY_VALUE_GENERIC> entrySet = ENTRYSET();
+		final Consumer<MAP.Entry KEY_VALUE_GENERIC> wrappingConsumer = (entry) -> consumer.accept(KEY2OBJ(entry.ENTRY_GET_KEY()), VALUE2OBJ(entry.ENTRY_GET_VALUE()));
+		if (entrySet instanceof FastEntrySet) {
+			((FastEntrySet KEY_VALUE_GENERIC)entrySet).fastForEach(wrappingConsumer);
+		} else {
+			entrySet.forEach(wrappingConsumer);
+		}
+	}
+
+#if KEYS_REFERENCE && VALUES_REFERENCE
+	@Override
+	default VALUE_GENERIC_TYPE getOrDefault(final KEY_TYPE key, final VALUE_GENERIC_TYPE defaultValue) {
+		return Map.super.getOrDefault(key, defaultValue);
+	}
+#endif
+
+
 #if KEYS_PRIMITIVE || VALUES_PRIMITIVE
 
 	/** Returns the value to which the specified key is mapped, or the {@code defaultValue} if this
@@ -306,7 +350,7 @@ public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<K
 	 * @see java.util.Map#getOrDefault(Object, Object)
 	 * @since 8.0.0
 	 */
-
+	@Override
 	default VALUE_GENERIC_TYPE getOrDefault(final KEY_TYPE key, final VALUE_GENERIC_TYPE defaultValue) {
 		final VALUE_GENERIC_TYPE v;
 		return ((v = GET_VALUE(key)) != defaultReturnValue() || containsKey(key)) ? v : defaultValue;
@@ -357,7 +401,7 @@ public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<K
 	 * @param newValue value to be associated with the specified key.
 	 *
 	 * @return {@code true} if the value was replaced.
-   	 *
+	 *
 	 * @see java.util.Map#replace(Object, Object, Object)
 	 * @since 8.0.0
 	 */
@@ -391,6 +435,10 @@ public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<K
 	 * it is not possible to not add a value for a given key, since the {@code mappingFunction} cannot
 	 * return {@code null}. If such a behavior is needed, please use the corresponding <em>nullable</em> version.
 	 *
+	 * @apiNote all {@code computeIfAbsent()} methods have a different logic based on the argument;
+	 * no delegation is performed, contrarily to other superficially similar 
+	 * methods such as {@link java.util.Iterator#forEachRemaining} or {@link java.util.List#replaceAll}.
+	 *
 	 * @param key key with which the specified value is to be associated.
 	 * @param mappingFunction the function to compute a value.
 	 *
@@ -400,7 +448,7 @@ public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<K
 	 * @since 8.0.0
 	 */
 
-	default VALUE_GENERIC_TYPE COMPUTE_IF_ABSENT_JDK(final KEY_GENERIC_TYPE key, final JDK_PRIMITIVE_FUNCTION KEY_SUPER_GENERIC VALUE_EXTENDS_GENERIC mappingFunction) {
+	default VALUE_GENERIC_TYPE computeIfAbsent(final KEY_GENERIC_TYPE key, final JDK_PRIMITIVE_FUNCTION KEY_SUPER_GENERIC VALUE_EXTENDS_GENERIC mappingFunction) {
 		java.util.Objects.requireNonNull(mappingFunction);
 		final VALUE_GENERIC_TYPE v = GET_VALUE(key);
 		if (v != defaultReturnValue() || containsKey(key)) return v;
@@ -409,6 +457,16 @@ public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<K
 		put(key, newValue);
 		return newValue;
 	}
+
+#if KEYS_REFERENCE
+	/**
+	 * @deprecated Please use {@code computeIfAbsent()} instead.
+	 */
+	@Deprecated
+	default VALUE_GENERIC_TYPE COMPUTE_IF_ABSENT_JDK(final KEY_GENERIC_TYPE key, final JDK_PRIMITIVE_FUNCTION KEY_SUPER_GENERIC VALUE_EXTENDS_GENERIC mappingFunction) {
+		return computeIfAbsent(key, mappingFunction);
+	}
+#endif
 
 #endif
 
@@ -453,6 +511,10 @@ public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<K
 	 * Since {@link it.unimi.dsi.fastutil.Function Function} has a {@link it.unimi.dsi.fastutil.Function#containsKey(Object) containsKey()}
 	 * method, it is possible to avoid adding a key by having {@code containsKey()} return {@code false} for that key.
 	 *
+	 * @apiNote all {@code computeIfAbsent()} methods have a different logic based on the argument;
+	 * no delegation is performed, contrarily to other superficially similar 
+	 * methods such as {@link java.util.Iterator#forEachRemaining} or {@link java.util.List#replaceAll}.
+	 *
 	 * @param key key with which the specified value is to be associated.
 	 * @param mappingFunction the function to compute a value.
 	 *
@@ -462,7 +524,7 @@ public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<K
 	 * @since 8.0.0
 	 */
 
-	default VALUE_GENERIC_TYPE COMPUTE_IF_ABSENT_PARTIAL(final KEY_GENERIC_TYPE key, final FUNCTION KEY_SUPER_GENERIC VALUE_EXTENDS_GENERIC mappingFunction) {
+	default VALUE_GENERIC_TYPE computeIfAbsent(final KEY_GENERIC_TYPE key, final FUNCTION KEY_SUPER_GENERIC VALUE_EXTENDS_GENERIC mappingFunction) {
 		java.util.Objects.requireNonNull(mappingFunction);
 		final VALUE_GENERIC_TYPE v = GET_VALUE(key), drv = defaultReturnValue();
 		if (v != drv || containsKey(key)) return v;
@@ -472,6 +534,15 @@ public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<K
 		put(key, newValue);
 		return newValue;
 	}
+
+	/**
+	 * @deprecated Please use {@code computeIfAbsent()} instead.
+	 */
+	@Deprecated
+	default VALUE_GENERIC_TYPE COMPUTE_IF_ABSENT_PARTIAL(final KEY_GENERIC_TYPE key, final FUNCTION KEY_SUPER_GENERIC VALUE_EXTENDS_GENERIC mappingFunction) {
+		return computeIfAbsent(key, mappingFunction);
+	}
+
 
 	/** If the value for the specified key is present, attempts to compute a new mapping given the key and its current mapped value.
 	 *
@@ -537,10 +608,12 @@ public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<K
 #endif
 	}
 
-#if VALUES_PRIMITIVE
 	/**
 	 * If the specified key is not already associated with a value, associates it with the given {@code value}.
 	 * Otherwise, replaces the associated value with the results of the given remapping function, or removes if the result is {@code null}.
+	 *
+	 * @apiNote The JDK specification for this method equates not being associated with a value with being associated with {code null}.
+	 * This is not the case for this method.
 	 *
 	 * @param key key with which the resulting value is to be associated.
 	 * @param value the value to be merged with the existing value associated with the key or, if no existing value is associated with the key, to be associated with the key.
@@ -551,23 +624,7 @@ public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<K
 	 * @see java.util.Map#merge(Object, Object, java.util.function.BiFunction)
 	 * @since 8.0.0
 	 */
-#else
-	/**
-	 * If the specified key is not already associated with a value or is associated with null, associates it with the given non-null {@code value}.
-	 * Otherwise, replaces the associated value with the results of the given remapping function, or removes if the result is {@code null}.
-	 *
-	 * @param key key with which the resulting value is to be associated.
-	 * @param value the non-{@code null} value to be merged with the existing value associated with the key or, if no existing value is associated with the key, to be associated with the key.
-	 * @param remappingFunction the function to recompute a value if present.
-	 *
-	 * @return the new value associated with the specified key, or the {@linkplain #defaultReturnValue() default return value} if no value is associated with the key.
-	 *
-	 * @see java.util.Map#merge(Object, Object, java.util.function.BiFunction)
-	 * @since 8.0.0
-	 */
-#endif
-
-	default VALUE_GENERIC_TYPE MERGE(final KEY_GENERIC_TYPE key, final VALUE_GENERIC_TYPE value, final java.util.function.BiFunction<? super VALUE_GENERIC_CLASS, ? super VALUE_GENERIC_CLASS, ? extends VALUE_GENERIC_CLASS> remappingFunction) {
+	default VALUE_GENERIC_TYPE merge(final KEY_GENERIC_TYPE key, final VALUE_GENERIC_TYPE value, final java.util.function.BiFunction<? super VALUE_GENERIC_CLASS, ? super VALUE_GENERIC_CLASS, ? extends VALUE_GENERIC_CLASS> remappingFunction) {
 		java.util.Objects.requireNonNull(remappingFunction);
 #if VALUES_REFERENCE
 		java.util.Objects.requireNonNull(value);
@@ -585,6 +642,107 @@ public interface MAP KEY_VALUE_GENERIC extends FUNCTION KEY_VALUE_GENERIC, Map<K
 		put(key, newValue);
 		return newValue;
 	}
+
+#if VALUES_PRIMITIVE && ! VALUE_CLASS_Boolean
+
+	/**
+	 * If the specified key is not already associated with a value, associates it with the given {@code value}.
+	 * Otherwise, replaces the associated value with the results of the given remapping function.
+	 *
+	 * @apiNote The JDK specification for this method equates not being associated with a value with being associated with {code null}.
+	 * This is not the case for this method. Moreover, this method cannot delete entries as the type-specific remapping
+	 * function cannot return {@code null}.
+	 *
+	 * @param key key with which the resulting value is to be associated.
+	 * @param value the value to be merged with the existing value associated with the key or, if no existing value is associated with the key, to be associated with the key.
+	 * @param remappingFunction the function to recompute a value if present.
+	 *
+	 * @return the new value associated with the specified key.
+	 *
+	 * @see java.util.Map#merge(Object, Object, java.util.function.BiFunction)
+	 * @since 8.5.0
+	 */
+	default VALUE_TYPE MERGE_VALUE(final KEY_GENERIC_TYPE key, final VALUE_TYPE value, final METHOD_ARG_VALUE_BINARY_OPERATOR remappingFunction) {
+		java.util.Objects.requireNonNull(remappingFunction);
+		final VALUE_TYPE oldValue = GET_VALUE(key), drv = defaultReturnValue();
+		final VALUE_TYPE newValue = oldValue != drv || containsKey(key) ? remappingFunction.VALUE_OPERATOR_APPLY(oldValue, value) : value;
+		put(key, newValue);
+		return newValue;
+	}
+
+#if VALUES_INT_LONG_DOUBLE
+	// Because our primitive BinaryOperator interface extends both the JDK's primitive
+	// and object BinaryOperator interfaces, calling this method with it would be ambiguous.
+	// This overload exists to pass it to the proper primitive overload.
+	/**
+	 * If the specified key is not already associated with a value, associates it with the given {@code value}.
+	 * Otherwise, replaces the associated value with the results of the given remapping function.
+	 *
+	 * @apiNote The JDK specification for this method equates not being associated with a value with being associated with {code null}.
+	 * This is not the case for this method. Moreover, this method cannot delete entries as the type-specific remapping
+	 * function cannot return {@code null}.
+	 *
+	 * <p><b>WARNING</b>: Overriding this method is almost always a mistake, as this
+	 * overload only exists to disambiguate. Instead, override the overload
+	 * that uses the JDK's primitive binary operator (e.g. {@link java.util.function.IntBinaryOperator}).
+	 *
+	 * <p>If Java supported final default methods, this would be one, but sadly it does not.
+	 *
+	 * <p>If you checked and are overriding the version with {@code java.util.function.XBinaryOperator}, and
+	 * still see this warning, then your IDE is incorrectly conflating this method with the proper
+	 * method to override, and you can safely ignore this message.
+	 *
+	 * @param key key with which the resulting value is to be associated.
+	 * @param value the value to be merged with the existing value associated with the key or, if no existing value is associated with the key, to be associated with the key.
+	 * @param remappingFunction the function to recompute a value if present.
+	 *
+	 * @see java.util.Map#merge(Object, Object, java.util.function.BiFunction)
+	 * @since 8.5.1
+	 */
+
+	default VALUE_TYPE MERGE_VALUE(final KEY_GENERIC_TYPE key, final VALUE_TYPE value, final VALUE_PACKAGE.VALUE_BINARY_OPERATOR remappingFunction) {
+		return MERGE_VALUE(key, value, (JDK_PRIMITIVE_VALUE_BINARY_OPERATOR)remappingFunction);
+	}
+#else
+	/**
+	 * If the specified key is not already associated with a value, associates it with the given {@code value}.
+	 * Otherwise, replaces the associated value with the results of the given remapping function.
+	 *
+	 * @apiNote The JDK specification for this method equates not being associated with a value with being associated with {code null}.
+	 * This is not the case for this method. Moreover, this method cannot delete entries as the type-specific remapping
+	 * function cannot return {@code null}.
+	 *
+	 * @param key key with which the resulting value is to be associated.
+	 * @param value the value to be merged with the existing value associated with the key or, if no existing value is associated with the key, to be associated with the key.
+	 * @param remappingFunction the function to recompute a value if present.
+	 *
+	 * @return the new value associated with the specified key.
+	 *
+	 * @see java.util.Map#merge(Object, Object, java.util.function.BiFunction)
+	 * @since 8.5.0
+	 * @implNote Unless the argument is type-specific, this method will introduce an intermediary
+	 *   lambda to perform narrowing and widening casts. Please use the type-specific overload to avoid this overhead.
+	 */
+
+	default VALUE_TYPE MERGE_VALUE(final KEY_GENERIC_TYPE key, final VALUE_TYPE value, final JDK_PRIMITIVE_VALUE_BINARY_OPERATOR remappingFunction) {
+		return MERGE_VALUE(key, value, remappingFunction instanceof METHOD_ARG_VALUE_BINARY_OPERATOR ? (METHOD_ARG_VALUE_BINARY_OPERATOR)remappingFunction : (x, y) -> VALUE_NARROWING(remappingFunction.JDK_PRIMITIVE_VALUE_OPERATOR_APPLY(x, y)));
+	}
+
+#endif
+
+#endif
+
+#if KEYS_REFERENCE
+
+	/**
+	 * @deprecated Please use {@code merge()} instead.
+	 */
+	@Deprecated
+	default VALUE_GENERIC_TYPE MERGE(final KEY_GENERIC_TYPE key, final VALUE_GENERIC_TYPE value, final java.util.function.BiFunction<? super VALUE_GENERIC_CLASS, ? super VALUE_GENERIC_CLASS, ? extends VALUE_GENERIC_CLASS> remappingFunction) {
+		return merge(key, value, remappingFunction);
+	}
+
+#endif
 
   /** {@inheritDoc}
 	 * <p>This default implementation just delegates to the corresponding {@link Map} method.

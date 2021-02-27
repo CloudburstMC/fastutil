@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil.ints;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +13,9 @@ package it.unimi.dsi.fastutil.ints;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package it.unimi.dsi.fastutil.ints;
+
 import static org.junit.Assert.assertSame;
 
 import org.junit.Test;
@@ -30,7 +31,7 @@ public class Int2ObjectFunctionTest {
 		@SuppressWarnings("serial")
 		final Int2ObjectFunction<Object> f = new AbstractInt2ObjectFunction<Object>() {
 			@Override
-			public Object get(int key) {
+			public Object get(final int key) {
 				return key == 0 ? zero : defRetValue;
 			}
 		};

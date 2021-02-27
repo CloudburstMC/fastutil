@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2020 Sebastiano Vigna
+ * Copyright (C) 2002-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,13 @@ package PACKAGE;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Consumer;
+#if KEYS_BYTE_CHAR_SHORT_FLOAT
+import WIDENED_PACKAGE.KEY_WIDENED_ITERATOR;
+import WIDENED_PACKAGE.WIDENED_ITERATORS;
+import WIDENED_PACKAGE.KEY_WIDENED_SPLITERATOR;
+import WIDENED_PACKAGE.WIDENED_SPLITERATORS;
+#endif
 
 /** A class providing static methods and objects that do useful things with type-specific sets.
  *
@@ -28,6 +35,9 @@ import java.util.Set;
 public final class SETS {
 
 	private SETS() {}
+
+	/** The maximum size to choose ArraySet over OpenHashSet for utilites that automatically choose. */
+	static final int ARRAY_SET_CUTOFF = 4;
 
 	/** An immutable class representing the empty set and implementing a type-specific set interface.
 	 *
@@ -64,8 +74,12 @@ public final class SETS {
 	 */
 	SUPPRESS_WARNINGS_KEY_RAWTYPES
 	public static final EmptySet EMPTY_SET = new EmptySet();
+	
+	// Used by Sets.of() instead of SETS.EMPTY_SET to make a dimorphic call site.
+	// See https://github.com/vigna/fastutil/issues/183
+	SUPPRESS_WARNINGS_KEY_UNCHECKED_RAWTYPES
+	static final SET UNMODIFIABLE_EMPTY_SET = SETS.unmodifiable(new ARRAY_SET(ARRAYS.EMPTY_ARRAY));
 
-#if KEYS_REFERENCE
 	/** Returns an empty set (immutable). It is serializable and cloneable.
 	 *
 	 * <p>This method provides a typesafe access to {@link #EMPTY_SET}.
@@ -75,8 +89,6 @@ public final class SETS {
 	public static KEY_GENERIC SET KEY_GENERIC emptySet() {
 		return EMPTY_SET;
 	}
-#endif
-
 
 	/** An immutable class representing a type-specific singleton set.
 	 *
@@ -104,7 +116,17 @@ public final class SETS {
 		public KEY_LIST_ITERATOR KEY_GENERIC iterator() { return ITERATORS.singleton(element); }
 
 		@Override
+		public KEY_SPLITERATOR KEY_GENERIC spliterator() { return SPLITERATORS.singleton(element); }
+
+		@Override
 		public int size() { return 1; }
+
+		@Override
+		public KEY_TYPE[] TO_KEY_ARRAY() { return new KEY_TYPE[]{element}; }
+
+		DEPRECATED_IF_KEYS_PRIMITIVE
+		@Override
+		public void forEach(final Consumer<? super KEY_GENERIC_CLASS> action) { action.accept(KEY2OBJ(element)); }
 
 		@Override
 		public boolean addAll(final Collection<? extends KEY_GENERIC_CLASS> c) { throw new UnsupportedOperationException(); }
@@ -116,6 +138,15 @@ public final class SETS {
 		public boolean retainAll(final Collection<?> c) { throw new UnsupportedOperationException(); }
 
 #if KEYS_PRIMITIVE
+		@Deprecated
+#endif
+		@Override
+		public boolean removeIf(final java.util.function.Predicate<? super KEY_GENERIC_CLASS> filter) { throw new UnsupportedOperationException(); }
+
+#if KEYS_PRIMITIVE
+
+		@Override
+		public void forEach(final METHOD_ARG_KEY_CONSUMER action) {	action.accept(element); }
 
 		@Override
 		public boolean addAll(final COLLECTION c) { throw new UnsupportedOperationException(); }
@@ -125,6 +156,22 @@ public final class SETS {
 
 		@Override
 		public boolean retainAll(final COLLECTION c) { throw new UnsupportedOperationException(); }
+
+		@Override
+		public boolean removeIf(final METHOD_ARG_PREDICATE filter) { throw new UnsupportedOperationException(); }
+
+#if KEYS_BYTE_CHAR_SHORT_FLOAT
+		@Override
+		public KEY_WIDENED_ITERATOR KEY_WIDENED_ITERATOR_METHOD() { return WIDENED_ITERATORS.singleton(element); }
+
+		@Override
+		public KEY_WIDENED_SPLITERATOR KEY_WIDENED_SPLITERATOR_METHOD() { return WIDENED_SPLITERATORS.singleton(element); }
+#endif
+
+		@Deprecated
+		@Override
+		public Object[] toArray() { return new Object[]{ KEY2OBJ(element) }; }
+
 
 #endif
 		@Override
@@ -236,6 +283,97 @@ public final class SETS {
 	public static KEY_GENERIC SET KEY_GENERIC unmodifiable(final SET KEY_GENERIC s) {	return new UnmodifiableSet KEY_GENERIC_DIAMOND(s); }
 
 
+#if KEY_CLASS_Byte || KEY_CLASS_Character || KEY_CLASS_Short || KEY_CLASS_Integer || KEY_CLASS_Long
+
+	/** Returns an unmodifiable type-specific set containing elements in the given range.
+	 *
+	 * @param from the starting element (lower bound) of the set (inclusive).
+	 * @param to the ending element (upper bound) of the set (exclusive).
+	 * @return an unmodifiable set containing the elements in the given range.
+	 */
+	public static SET fromTo(final KEY_TYPE from, final KEY_TYPE to) {
+		return new ABSTRACT_SET() {
+			@Override
+			public boolean contains(final KEY_TYPE x) {
+				return x >= from && x < to;
+			}
+		
+			@Override
+			public KEY_ITERATOR iterator() {
+				return ITERATORS.fromTo(from, to);
+			}
+		
+			@Override
+			public int size() {
+#if KEY_CLASS_Long
+				final long size = to - from;
+#else
+				final long size = (long)to - (long)from;
+#endif
+				return size >= 0 && size <= Integer.MAX_VALUE ? (int)size : Integer.MAX_VALUE;
+			}
+		};
+	}
+
+	/** Returns an unmodifiable type-specific set containing elements greater than or equal to a given element.
+	 *
+	 * @param from the starting element (lower bound) of the set (inclusive).
+	 * @return an unmodifiable set containing the elements greater than or equal to {@code from}.
+	 */
+	public static SET from(final KEY_TYPE from) {
+		return new ABSTRACT_SET() {
+			@Override
+			public boolean contains(final KEY_TYPE x) {
+				return x >= from;
+			}
+		
+			@Override
+			public KEY_ITERATOR iterator() {
+				return ITERATORS.concat(new KEY_ITERATOR[] { ITERATORS.fromTo(from, KEY_CLASS.MAX_VALUE), SETS.singleton(KEY_CLASS.MAX_VALUE).iterator() });
+			}
+		
+			@Override
+			public int size() {
+#if KEY_CLASS_Long
+				final long size = Long.MAX_VALUE - from + 1;
+#else
+				final long size = KEY_CLASS.MAX_VALUE - (long)from + 1;
+#endif
+				return size >= 0 && size <= Integer.MAX_VALUE ? (int)size : Integer.MAX_VALUE;
+			}
+		};
+	}
+
+	/** Returns an unmodifiable type-specific set containing elements smaller than a given element.
+	 *
+	 * @param to the ending element (upper bound) of the set (exclusive).
+	 * @return an unmodifiable set containing the elements smaller than {@code to}.
+	 */
+	public static SET to(final KEY_TYPE to) {
+		return new ABSTRACT_SET() {
+			@Override
+			public boolean contains(final KEY_TYPE x) {
+				return x < to;
+			}
+		
+			@Override
+			public KEY_ITERATOR iterator() {
+				return ITERATORS.fromTo(KEY_CLASS.MIN_VALUE, to);
+			}
+		
+			@Override
+			public int size() {
+#if KEY_CLASS_Long
+				final long size = to - Long.MIN_VALUE;
+#else
+				final long size = (long)to - KEY_CLASS.MIN_VALUE;
+#endif
+				return size >= 0 && size <= Integer.MAX_VALUE ? (int)size : Integer.MAX_VALUE;
+			}
+		};
+	}
+
+#endif
 
 #ifdef TEST
 
@@ -252,7 +390,7 @@ public final class SETS {
 	}
 
 
-	private static void test() {
+	private static void test() throws Exception{
 		int n = 100;
 		int c;
 		KEY_TYPE k = genKey();
@@ -484,7 +622,7 @@ public final class SETS {
 
 		SET m2 = null;
 
-		try {
+		{
 			java.io.File ff = new java.io.File("it.unimi.dsi.fastutil.test." + m.getClass().getSimpleName() + "." + n);
 			java.io.OutputStream os = new java.io.FileOutputStream(ff);
 			java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(os);
@@ -499,12 +637,8 @@ public final class SETS {
 			ois.close();
 			ff.delete();
 		}
-		catch(Exception e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
 
-#if ! KEY_CLASS_Reference
+#if ! KEYS_USE_REFERENCE_EQUALITY
 
 		ensure(m2.hashCode() == h, "Error (" + seed + "): hashCode() changed after save/read");
 
@@ -530,8 +664,7 @@ public final class SETS {
 	}
 
 	private static void fatal(String msg) {
-		System.out.println(msg);
-		System.exit(1);
+		throw new AssertionError(msg);
 	}
 
 	private static void ensure(boolean cond, String msg) {
@@ -550,6 +683,7 @@ public final class SETS {
 		} catch(Throwable e) {
 			e.printStackTrace(System.err);
 			System.err.println("seed: " + seed);
+			throw e;
 		}
 	}
 

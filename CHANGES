@@ -1,3 +1,111 @@
+8.5.2
+
+- Fixed wrong implementation of forEachRemaining() in hash-based
+  containers.
+
+- Fixed iteration in linked hash maps.
+
+- Fixed possible infinite recursion in AbstractMap.
+
+8.5.1
+
+- Fixed bug in AbstractIndexBasedBigIterator that was affecting
+  iterations on big lists.
+
+- Added missing disambiguation method for type-specific Map.merge().
+
+8.5.0
+
+- Added type-specific spliterators and primitive stream methods to all
+  Collection types. Thanks to C. Sean Young <csyoung@google.com> for this
+  massive code contribution.
+
+- Added fast spliterator implementations for most concrete types. The only
+  Collection types that do not currently have an optimized spliterator are
+  RBTreeSet/Map, AVLTreeSet/Map, and ArrayFrontCodedList. These are
+  planned for a future version. Thanks to C. Sean Young
+  <csyoung@google.com> for implementing this feature.
+
+- Added a lot of special cases for AbstractList's methods to better take
+  advantage of RandomAccess based lists (the base List interface's default
+  methods will still use the iterator based versions always). Thanks to C.
+  Sean Young <csyoung@google.com> for implementing this feature.
+
+- New immutable array-based lists and associated List.of() methods.
+
+- Type specific versions of Predicate have been added.
+  Methods that take predicates (mainly Collection.removeIf) have been
+  updated to have an overload that takes that.
+  A consequence of this change is that removeIf(IntPredicate) on
+  ByteCollection, ShortCollection, and CharCollection have been deprecated
+  in favor of removeIf(Byte/Short/CharPredicate), which does not do widening casts.
+  If you have an implementation of ByteCollection, ShortCollection, or CharCollection
+  that implements removeIf(IntPredicate), you should update it to instead override
+  removeIf(Byte/Short/CharPredicate).
+
+- Type-specific map methods merge() and computeIfAbsent() now have the
+  same name as in the JDK. The older names (with a type infix) have been
+  deprecated.
+
+- computeIfAbsentPartial() has been renamed computeIfAbsent() so that
+  lambdas will generate fastutil type-specific functions.
+
+- Fixed deserialization bug in front-coded big lists of arrays. Thanks
+  to Antoine Pietri for reporting this bug.
+
+- New type-specific Map.merge() methods.
+
+- Array lists have optimized addAll() methods for object lists, too, and
+  big lists have specialized addAll() methods for lists. Thanks to
+  Erich Schubert for reporting this issue.
+
+8.4.4
+
+- Renamed andThen/compose methods for type-specific functions
+  to avoid potential ambiguous calls.
+
+- Now bulk colletion methods will try to use type-specific methods
+  if available. A side effect is that in case someone implemented
+  type-specific methods using the JDK version an infinite recursion
+  will happen. Thanks to C. Sean Young for this improvement.
+
+- New Pair and SortedPair implementations, both standard and type-specific.
+
+8.4.3
+
+- Implemented andThen/compose methods for type-specific functions.
+
+- Parallel sort implementations now use the common pool. Thanks to
+  shevek@github.com for suggesting this change.
+
+- Static counting method for type-specific iterables.
+
+- Static factory methods for immutable sets of primitive scalar types
+  within a given range.
+
+- .of() factory methods for lists and sets.
+
+8.4.2
+
+- Big front-coded lists.
+
+8.4.1
+
+- Ported basic parallel quicksort to big arrays.
+
+8.4.0
+
+- Limited support for atomic big arrays of integers and longs.
+
+8.3.2
+
+- The documentation and the constructor for hash-based containers
+  was allowing a load factor of 1. Thanks to Andy Clegg for
+  reporting this bug.
+
+- The copy constructor of array-based containers are now more efficient.
+  Thanks to Vladimir Krivosheev for proposing this enhancement.
+
 8.3.1
 
 - Fixed old-standing bug in the remove() method of the key set of

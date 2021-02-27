@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil.objects;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +13,8 @@ package it.unimi.dsi.fastutil.objects;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package it.unimi.dsi.fastutil.objects;
 
 
 import static it.unimi.dsi.fastutil.BigArrays.copy;
@@ -33,6 +33,7 @@ import java.util.Arrays;
 import org.junit.Test;
 
 import it.unimi.dsi.fastutil.BigArrays;
+import it.unimi.dsi.fastutil.MainRunner;
 
 public class ObjectBigArraysTest {
 
@@ -137,5 +138,10 @@ public class ObjectBigArraysTest {
 		assertTrue(BigArrays.equals(b, c));
 		b[0][0] = 0;
 		assertFalse(BigArrays.equals(b, c));
+	}
+
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(ObjectBigArrays.class, "test", /*num=*/"10000", /*seed=*/"293843");
 	}
 }

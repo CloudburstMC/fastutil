@@ -1,7 +1,5 @@
-package it.unimi.dsi.fastutil.ints;
-
 /*
- * Copyright (C) 2017-2020 Sebastiano Vigna
+ * Copyright (C) 2017-2021 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +14,8 @@ package it.unimi.dsi.fastutil.ints;
  * limitations under the License.
  */
 
+package it.unimi.dsi.fastutil.ints;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.Random;
 
 import org.junit.Test;
+
+import it.unimi.dsi.fastutil.MainRunner;
 
 public class IntArraysTest {
 
@@ -1289,5 +1291,10 @@ public class IntArraysTest {
 
 		IntArrays.stabilize(perm, val, 1, 3);
 		assertArrayEquals(new int[] { 4, 2, 3, 1, 0 }, perm);
+	}
+	
+	@Test
+	public void testLegacyMainMethodTests() throws Exception {
+		MainRunner.callMainIfExists(IntArrays.class, "test", /*num=*/"1000", /*seed=*/"848747");
 	}
 }
