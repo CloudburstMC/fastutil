@@ -5,7 +5,7 @@
     <parent>
         <artifactId>fastutil-common-parent</artifactId>
         <groupId>com.nukkitx.fastutil</groupId>
-        <version>8.3.1</version>
+        <version>8.5.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,7 +15,12 @@
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-common</artifactId>
-            <version>8.3.1</version>
+            <version>8.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.nukkitx.fastutil</groupId>
+            <artifactId>fastutil-double-common</artifactId>
+            <version>8.5.2</version>
         </dependency>
     </dependencies>
 
@@ -33,9 +38,10 @@
                         <include>${package}/floats/AbstractFloatCollection.java</include>
                         <include>${package}/floats/AbstractFloatIterator.java</include>
                         <include>${package}/floats/FloatIterable.java</include>
-                        <include>${package}/floats/FloatIterator.java</include>
                         <include>${package}/floats/FloatBidirectionalIterable.java</include>
                         <include>${package}/floats/FloatHash.java</include>
+                        <include>${package}/floats/FloatBinaryOperator.java</include>
+                        <include>${package}/floats/Float*Pair.java</include>
                     </includes>
                     <testIncludes>
                         <testInclude>*.noop</testInclude>

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>fastutil-common-parent</artifactId>
         <groupId>com.nukkitx.fastutil</groupId>
-        <version>8.3.1</version>
+        <version>8.5.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,7 +15,7 @@
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-common</artifactId>
-            <version>8.3.1</version>
+            <version>8.5.2</version>
         </dependency>
     </dependencies>
 
@@ -33,9 +33,10 @@
                         <include>${package}/longs/AbstractLongCollection.java</include>
                         <include>${package}/longs/AbstractLongIterator.java</include>
                         <include>${package}/longs/LongIterable.java</include>
-                        <include>${package}/longs/LongIterator.java</include>
                         <include>${package}/longs/LongBidirectionalIterable.java</include>
                         <include>${package}/longs/LongHash.java</include>
+                        <include>${package}/longs/LongBinaryOperator.java</include>
+                        <include>${package}/longs/Long*Pair.java</include>
                     </includes>
                     <testIncludes>
                         <testInclude>*.noop</testInclude>

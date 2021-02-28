@@ -5,7 +5,7 @@
     <parent>
         <artifactId>fastutil-byte-map-parent</artifactId>
         <groupId>com.nukkitx.fastutil</groupId>
-        <version>8.3.1</version>
+        <version>8.5.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,12 +15,17 @@
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-byte-sets</artifactId>
-            <version>8.3.1</version>
+            <version>8.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.nukkitx.fastutil</groupId>
+            <artifactId>fastutil-reference-sets</artifactId>
+            <version>8.5.2</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-object-sets</artifactId>
-            <version>8.3.1</version>
+            <version>8.5.2</version>
         </dependency>
     </dependencies>
 
@@ -36,6 +41,9 @@
                         <include>${package}/bytes/AbstractByte2Reference*.java</include>
                         <include>${package}/bytes/Byte2Reference*.java</include>
                     </includes>
+                    <excludes>
+                        <exclude>${package}/bytes/Byte2ReferenceFunction.java</exclude>
+                    </excludes>
                     <testIncludes>
                         <testInclude>noop</testInclude>
                     </testIncludes>

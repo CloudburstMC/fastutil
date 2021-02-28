@@ -5,7 +5,7 @@
     <parent>
         <artifactId>fastutil-object-map-parent</artifactId>
         <groupId>com.nukkitx.fastutil</groupId>
-        <version>8.3.1</version>
+        <version>8.5.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,7 +15,7 @@
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-object-sets</artifactId>
-            <version>8.3.1</version>
+            <version>8.5.2</version>
         </dependency>
     </dependencies>
 
@@ -31,6 +31,9 @@
                         <include>${package}/objects/AbstractObject2Object*.java</include>
                         <include>${package}/objects/Object2Object*.java</include>
                     </includes>
+                    <excludes>
+                        <exclude>${package}/objects/Object2ObjectFunction.java</exclude>
+                    </excludes>
                     <testIncludes>
                         <testInclude>noop</testInclude>
                     </testIncludes>

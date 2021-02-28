@@ -5,7 +5,7 @@
     <parent>
         <artifactId>fastutil-set-parent</artifactId>
         <groupId>com.nukkitx.fastutil</groupId>
-        <version>8.3.1</version>
+        <version>8.5.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,7 +15,7 @@
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-long-common</artifactId>
-            <version>8.3.1</version>
+            <version>8.5.2</version>
         </dependency>
     </dependencies>
 

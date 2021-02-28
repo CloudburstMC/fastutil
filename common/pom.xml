@@ -5,7 +5,7 @@
     <parent>
         <artifactId>fastutil-parent</artifactId>
         <groupId>com.nukkitx.fastutil</groupId>
-        <version>8.3.1</version>
+        <version>8.5.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -38,6 +38,8 @@
                         <include>${package}/BigListIterator.java</include>
                         <include>${package}/Size64.java</include>
                         <include>${package}/**/*Consumer.java</include>
+                        <include>${package}/Pair.java</include>
+                        <include>${package}/SortedPair.java</include>
                         <!-- Iterators -->
                         <include>${package}/objects/ObjectIterator.java</include>
                         <include>${package}/booleans/BooleanIterator.java</include>
@@ -48,6 +50,27 @@
                         <include>${package}/longs/LongIterator.java</include>
                         <include>${package}/floats/FloatIterator.java</include>
                         <include>${package}/doubles/DoubleIterator.java</include>
+                        <!-- Spliterators -->
+                        <include>${package}/objects/ObjectSpliterator.java</include>
+                        <include>${package}/booleans/BooleanSpliterator.java</include>
+                        <include>${package}/bytes/ByteSpliterator.java</include>
+                        <include>${package}/chars/CharSpliterator.java</include>
+                        <include>${package}/shorts/ShortSpliterator.java</include>
+                        <include>${package}/ints/IntSpliterator.java</include>
+                        <include>${package}/longs/LongSpliterator.java</include>
+                        <include>${package}/floats/FloatSpliterator.java</include>
+                        <include>${package}/doubles/DoubleSpliterator.java</include>
+                        <!-- Functions -->
+                        <include>${package}/booleans/Object2*Function.java</include>
+                        <include>${package}/booleans/Reference2*Function.java</include>
+                        <include>${package}/booleans/Boolean2*Function.java</include>
+                        <include>${package}/booleans/Byte2*Function.java</include>
+                        <include>${package}/booleans/Char2*Function.java</include>
+                        <include>${package}/booleans/Short2*Function.java</include>
+                        <include>${package}/booleans/Int2*Function.java</include>
+                        <include>${package}/booleans/Long2*Function.java</include>
+                        <include>${package}/booleans/Float2*Function.java</include>
+                        <include>${package}/booleans/Double2*Function.java</include>
                     </includes>
                     <testIncludes>
                         <testInclude>${package}/ArraysTest.java</testInclude>

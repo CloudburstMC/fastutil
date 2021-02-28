@@ -5,7 +5,7 @@
     <parent>
         <artifactId>fastutil-int-map-parent</artifactId>
         <groupId>com.nukkitx.fastutil</groupId>
-        <version>8.3.1</version>
+        <version>8.5.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,17 +15,17 @@
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-int-sets</artifactId>
-            <version>8.3.1</version>
+            <version>8.5.2</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-char-sets</artifactId>
-            <version>8.3.1</version>
+            <version>8.5.2</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-object-sets</artifactId>
-            <version>8.3.1</version>
+            <version>8.5.2</version>
         </dependency>
     </dependencies>
 
@@ -41,6 +41,9 @@
                         <include>${package}/ints/AbstractInt2Char*.java</include>
                         <include>${package}/ints/Int2Char*.java</include>
                     </includes>
+                    <excludes>
+                        <exclude>${package}/ints/Int2CharFunction.java</exclude>
+                    </excludes>
                     <testIncludes>
                         <testInclude>noop</testInclude>
                     </testIncludes>

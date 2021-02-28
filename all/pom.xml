@@ -3,53 +3,38 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>fastutil-map-parent</artifactId>
+        <artifactId>fastutil-parent</artifactId>
         <groupId>com.nukkitx.fastutil</groupId>
         <version>8.5.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>fastutil-all-maps</artifactId>
+    <artifactId>fastutil-all</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
-            <artifactId>fastutil-object-all-maps</artifactId>
+            <artifactId>fastutil-common</artifactId>
             <version>8.5.2</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
-            <artifactId>fastutil-byte-all-maps</artifactId>
+            <artifactId>fastutil-io</artifactId>
             <version>8.5.2</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
-            <artifactId>fastutil-char-all-maps</artifactId>
+            <artifactId>fastutil-all-maps</artifactId>
             <version>8.5.2</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
-            <artifactId>fastutil-short-all-maps</artifactId>
+            <artifactId>fastutil-all-queues</artifactId>
             <version>8.5.2</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
-            <artifactId>fastutil-int-all-maps</artifactId>
-            <version>8.5.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.nukkitx.fastutil</groupId>
-            <artifactId>fastutil-long-all-maps</artifactId>
-            <version>8.5.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.nukkitx.fastutil</groupId>
-            <artifactId>fastutil-float-all-maps</artifactId>
-            <version>8.5.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.nukkitx.fastutil</groupId>
-            <artifactId>fastutil-double-all-maps</artifactId>
+            <artifactId>fastutil-all-sets</artifactId>
             <version>8.5.2</version>
         </dependency>
     </dependencies>
