@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-double-queues</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.queues.doubles</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

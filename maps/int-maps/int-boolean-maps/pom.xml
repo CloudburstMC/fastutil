@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-int-boolean-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.ints.booleans</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

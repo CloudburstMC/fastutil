@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-int-sets</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.sets.ints</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

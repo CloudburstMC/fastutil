@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-byte-double-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.bytes.doubles</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

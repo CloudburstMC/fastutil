@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-all-queues</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.queues.all</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

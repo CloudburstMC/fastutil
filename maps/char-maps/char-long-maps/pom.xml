@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-char-long-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.chars.longs</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

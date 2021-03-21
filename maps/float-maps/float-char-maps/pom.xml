@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-float-char-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.floats.chars</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

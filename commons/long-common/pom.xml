@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-long-common</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.commons.longs</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

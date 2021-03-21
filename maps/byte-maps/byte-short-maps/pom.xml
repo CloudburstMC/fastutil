@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-byte-short-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.bytes.shorts</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

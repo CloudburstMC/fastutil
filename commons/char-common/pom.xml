@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-char-common</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.commons.chars</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

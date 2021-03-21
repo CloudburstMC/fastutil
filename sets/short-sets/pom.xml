@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-short-sets</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.sets.shorts</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

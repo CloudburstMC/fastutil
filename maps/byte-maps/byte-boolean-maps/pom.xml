@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-byte-boolean-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.bytes.booleans</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

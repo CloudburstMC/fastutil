@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-char-byte-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.chars.bytes</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

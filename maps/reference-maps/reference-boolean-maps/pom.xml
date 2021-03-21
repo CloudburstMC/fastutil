@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-reference-boolean-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.references.booleans</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

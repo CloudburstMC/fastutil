@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-common</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.common</jigsaw.module>
+    </properties>
+
     <build>
         <sourceDirectory>${maven.multiModuleProjectDirectory}/src</sourceDirectory>
         <testSourceDirectory>${maven.multiModuleProjectDirectory}/test</testSourceDirectory>

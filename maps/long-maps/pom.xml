@@ -12,6 +12,10 @@
     <packaging>pom</packaging>
     <artifactId>fastutil-long-map-parent</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.longs.all</jigsaw.module>
+    </properties>
+
     <modules>
         <module>long-object-maps</module>
         <module>long-reference-maps</module>

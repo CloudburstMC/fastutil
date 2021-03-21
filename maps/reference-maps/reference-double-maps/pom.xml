@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-reference-double-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.references.doubles</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

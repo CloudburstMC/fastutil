@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-double-char-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.doubles.chars</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

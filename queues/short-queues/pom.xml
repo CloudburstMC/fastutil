@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-short-queues</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.queues.shorts</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

@@ -12,6 +12,10 @@
     <packaging>pom</packaging>
     <artifactId>fastutil-short-map-parent</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.shorts.all</jigsaw.module>
+    </properties>
+
     <modules>
         <module>short-object-maps</module>
         <module>short-reference-maps</module>

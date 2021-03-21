@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-double-boolean-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.doubles.booleans</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

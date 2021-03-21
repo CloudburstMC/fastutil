@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-double-common</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.commons.doubles</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

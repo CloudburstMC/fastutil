@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-object-sets</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.sets.objects</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

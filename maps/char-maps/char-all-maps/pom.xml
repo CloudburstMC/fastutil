@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-char-all-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.chars.all</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

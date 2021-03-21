@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-long-int-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.longs.ints</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-long-sets</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.sets.longs</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

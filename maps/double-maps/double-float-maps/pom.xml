@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-double-float-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.doubles.floats</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

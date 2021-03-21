@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-all-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.all</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

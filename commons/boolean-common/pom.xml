@@ -11,6 +11,11 @@
 
     <artifactId>fastutil-boolean-common</artifactId>
 
+
+    <properties>
+        <jigsaw.module>fastutil.commons.booleans</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

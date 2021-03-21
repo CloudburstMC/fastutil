@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-float-sets</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.sets.floats</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-all-sets</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.sets.all</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

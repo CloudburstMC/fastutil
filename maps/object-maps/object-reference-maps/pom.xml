@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-object-reference-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.objects.references</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

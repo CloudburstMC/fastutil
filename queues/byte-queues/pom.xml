@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-byte-queues</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.queues.bytes</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-float-common</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.commons.floats</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

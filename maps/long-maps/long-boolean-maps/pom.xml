@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-long-boolean-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.longs.booleans</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

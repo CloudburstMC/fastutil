@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-byte-sets</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.sets.bytes</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

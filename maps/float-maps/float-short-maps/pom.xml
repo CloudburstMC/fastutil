@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-float-short-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.floats.shorts</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

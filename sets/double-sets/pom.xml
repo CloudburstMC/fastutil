@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-double-sets</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.sets.doubles</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

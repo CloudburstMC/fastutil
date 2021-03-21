@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-object-int-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.objects.ints</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

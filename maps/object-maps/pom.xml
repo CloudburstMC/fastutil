@@ -12,6 +12,10 @@
     <packaging>pom</packaging>
     <artifactId>fastutil-object-map-parent</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.objects.all</jigsaw.module>
+    </properties>
+
     <modules>
         <module>object-object-maps</module>
         <module>object-reference-maps</module>

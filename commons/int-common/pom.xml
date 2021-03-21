@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-int-common</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.commons.ints</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

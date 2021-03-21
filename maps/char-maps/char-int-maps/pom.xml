@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-char-int-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.chars.ints</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

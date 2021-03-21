@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-io</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.io</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

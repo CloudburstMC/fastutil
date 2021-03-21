@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-byte-long-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.bytes.longs</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

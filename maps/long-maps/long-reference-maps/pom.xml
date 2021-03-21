@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-long-reference-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.longs.references</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

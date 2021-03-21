@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-char-sets</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.sets.chars</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>

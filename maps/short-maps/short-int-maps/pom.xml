@@ -11,6 +11,10 @@
 
     <artifactId>fastutil-short-int-maps</artifactId>
 
+    <properties>
+        <jigsaw.module>fastutil.maps.shorts.ints</jigsaw.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
