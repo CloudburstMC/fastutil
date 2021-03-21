@@ -5,7 +5,7 @@
     <parent>
         <artifactId>fastutil-queue-parent</artifactId>
         <groupId>com.nukkitx.fastutil</groupId>
-        <version>8.5.2</version>
+        <version>8.5.3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -19,47 +19,47 @@
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-object-queues</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-boolean-queues</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-byte-queues</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-char-queues</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-short-queues</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-int-queues</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-long-queues</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-float-queues</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-double-queues</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
     </dependencies>
 </project>

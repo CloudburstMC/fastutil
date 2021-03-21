@@ -5,7 +5,7 @@
     <parent>
         <artifactId>fastutil-char-map-parent</artifactId>
         <groupId>com.nukkitx.fastutil</groupId>
-        <version>8.5.2</version>
+        <version>8.5.3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -19,52 +19,52 @@
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-char-object-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-char-reference-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-char-boolean-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-char-byte-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-char-char-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-char-short-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-char-int-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-char-long-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-char-float-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-char-double-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
     </dependencies>
 </project>

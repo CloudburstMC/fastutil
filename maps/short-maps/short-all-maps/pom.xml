@@ -5,7 +5,7 @@
     <parent>
         <artifactId>fastutil-short-map-parent</artifactId>
         <groupId>com.nukkitx.fastutil</groupId>
-        <version>8.5.2</version>
+        <version>8.5.3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,52 +15,52 @@
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-short-object-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-short-reference-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-short-boolean-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-short-byte-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-short-char-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-short-short-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-short-int-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-short-long-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-short-float-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-short-double-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
     </dependencies>
 </project>

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>fastutil-byte-map-parent</artifactId>
         <groupId>com.nukkitx.fastutil</groupId>
-        <version>8.5.2</version>
+        <version>8.5.3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -19,52 +19,52 @@
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-byte-object-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-byte-reference-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-byte-boolean-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-byte-byte-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-byte-char-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-byte-short-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-byte-int-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-byte-long-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-byte-float-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-byte-double-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
     </dependencies>
 </project>

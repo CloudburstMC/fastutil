@@ -5,7 +5,7 @@
     <parent>
         <artifactId>fastutil-map-parent</artifactId>
         <groupId>com.nukkitx.fastutil</groupId>
-        <version>8.5.2</version>
+        <version>8.5.3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -19,42 +19,42 @@
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-object-all-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-byte-all-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-char-all-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-short-all-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-int-all-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-long-all-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-float-all-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.nukkitx.fastutil</groupId>
             <artifactId>fastutil-double-all-maps</artifactId>
-            <version>8.5.2</version>
+            <version>8.5.3</version>
         </dependency>
     </dependencies>
 </project>
