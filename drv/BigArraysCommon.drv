@@ -28,7 +28,6 @@
 
 package it.unimi.dsi.fastutil;
 
-import it.unimi.dsi.fastutil.ints.IntBigArrayBigList;
 import it.unimi.dsi.fastutil.longs.LongComparator;
 import it.unimi.dsi.fastutil.bytes.ByteBigArrays;
 import it.unimi.dsi.fastutil.booleans.BooleanBigArrays;
@@ -178,7 +177,7 @@ import java.util.Random;
  * <p>
  * If you find the kind of &ldquo;bare hands&rdquo; approach to big arrays not
  * enough object-oriented, please use big lists based on big arrays (e.g.,
- * {@link IntBigArrayBigList}). Big arrays follow the Java tradition of
+ * {@link it.unimi.dsi.fastutil.ints.IntBigArrayBigList}). Big arrays follow the Java tradition of
  * considering arrays as a &ldquo;legal alien&rdquo;&mdash;something in-between
  * an object and a primitive type. This approach lacks the consistency of a full
  * object-oriented approach, but provides some significant performance gains.
