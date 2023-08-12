@@ -27,7 +27,7 @@ publishing {
         }
     }
     publications {
-        create<MavenPublication>("library") {
+        create<MavenPublication>("maven") {
             from(components["java"])
             pom {
                 packaging = "jar"
