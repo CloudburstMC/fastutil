@@ -1,8 +1,19 @@
-name: Publish
 on:
-  push:
-    tags:
-      - '*'
+  workflow_call:
+    inputs:
+      deploy-url:
+        description: 'The maven repository to deploy to'
+        required: true
+        type: string
+    secrets:
+      DEPLOY_USERNAME:
+        required: true
+      DEPLOY_PASSWORD:
+        required: true
+      PGP_SECRET:
+        required: true
+      PGP_PASSPHRASE:
+        required: true
 
 jobs:
   publish:
@@ -13,13 +24,18 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '8'
-          gpg-private-key: ${{ secrets.MAVEN_CENTRAL_SECRET }}
-          gpg-passphrase: ${{ secrets.MAVEN_CENTRAL_PASSPHRASE }}
-      - uses: gradle/gradle-build-action@v2
-      - name: Publish
+      - name: Generate sources
+        run: make sources
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+      - name: Build
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: wrapper
+          arguments: "publish"
         env:
-          MAVEN_DEPLOY_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_DEPLOY_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-          PGP_SECRET: ${{ secrets.MAVEN_CENTRAL_SECRET }}
-          PGP_PASSPHRASE: ${{ secrets.MAVEN_CENTRAL_PASSPHRASE }}
-        run: gradle publish
+          MAVEN_DEPLOY_USERNAME: ${{ secrets.DEPLOY_USERNAME }}
+          MAVEN_DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+          MAVEN_DEPLOY_URL: ${{ inputs.deploy-url }}
