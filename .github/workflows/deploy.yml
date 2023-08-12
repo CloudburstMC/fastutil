@@ -15,6 +15,9 @@ on:
       PGP_PASSPHRASE:
         required: true
 
+env:
+  GRADLE_OPTS: "-Dorg.gradle.parallel=true -Dorg.gradle.daemon=false -Dorg.gradle.caching=true -Dorg.gradle.welcome=never"
+
 jobs:
   publish:
     runs-on: ubuntu-latest
