@@ -1,6 +1,8 @@
 subprojects {
     apply(plugin = "fastutil")
 
+    group = "org.cloudburstmc.fastutil.maps"
+
     val (key, value) = project.getMapTypes()
 
     val pkg = key.packagePath()

@@ -1,6 +1,8 @@
 subprojects {
     apply(plugin = "fastutil")
 
+    group = "org.cloudburstmc.fastutil.biglists"
+
     val type = project.getType()
     val pkg = type.packagePath()
     val cType = type.capitalised()
