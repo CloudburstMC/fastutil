@@ -47,6 +47,7 @@ subprojects {
             )
 
             includes.removeAll(getCoreIncludes())
+            exclude(getCoreIncludes())
         }
     }
 
