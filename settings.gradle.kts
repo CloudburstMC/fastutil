@@ -12,6 +12,7 @@ pluginManagement {
 
 plugins {
     id("org.cloudburstmc.fastutil-plugin")
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
 fun addModule(name: String) {

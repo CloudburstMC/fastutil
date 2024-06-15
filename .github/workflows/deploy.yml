@@ -26,7 +26,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '8'
+          java-version: '21'
       - name: Generate sources
         run: make sources
       - name: Validate Gradle Wrapper
