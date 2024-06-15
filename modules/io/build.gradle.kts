@@ -1,5 +1,7 @@
+description = "Fastutil IO"
+
 plugins {
-    id("fastutil")
+    id("fastutil.module")
 }
 
 dependencies {

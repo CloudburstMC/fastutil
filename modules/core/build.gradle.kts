@@ -1,5 +1,7 @@
+description = "Fastutil core"
+
 plugins {
-    id("fastutil")
+    id("fastutil.module")
 }
 
 sourceSets.main {

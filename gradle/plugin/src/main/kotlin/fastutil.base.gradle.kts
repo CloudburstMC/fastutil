@@ -1,16 +1,6 @@
 plugins {
-    id("java-library")
     id("maven-publish")
     id("signing")
-}
-
-java {
-    withJavadocJar()
-    withSourcesJar()
-
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
-    }
 }
 
 publishing {
@@ -28,9 +18,9 @@ publishing {
     }
     publications {
         create<MavenPublication>("maven") {
-            from(components["java"])
             pom {
-                packaging = "jar"
+                name = project.provider { project.description }
+                description = "A component of the Fastutil library"
                 url.set("https://github.com/CloudburstMC/fastutil")
 
                 scm {
@@ -63,18 +53,4 @@ signing {
         useInMemoryPgpKeys(System.getenv("PGP_SECRET"), System.getenv("PGP_PASSPHRASE"))
         sign(publishing.publications["maven"])
     }
-}
-
-tasks.javadoc {
-    options {
-        (this as CoreJavadocOptions).addStringOption("Xdoclint:none", "-quiet")
-    }
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-
-tasks.compileJava {
-    options.encoding = Charsets.UTF_8.name();
 }

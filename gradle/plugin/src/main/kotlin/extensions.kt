@@ -1,7 +1,7 @@
-import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.lib.RepositoryBuilder
 import org.gradle.api.Project
+import org.gradle.api.initialization.Settings
 
 const val PKG = "it/unimi/dsi/fastutil"
 
@@ -82,4 +82,8 @@ fun Project.isRelease(): Boolean {
     }
     println("Snapshot build. No tag found for ${headRef.objectId.name}")
     return false
+}
+
+fun Settings.addModule(name: String) {
+    include(":modules:$name")
 }

@@ -1,11 +1,13 @@
 subprojects {
-    apply(plugin = "fastutil")
+    apply(plugin = "fastutil.module")
 
     group = "org.cloudburstmc.fastutil.biglists"
 
     val type = project.getType()
     val pkg = type.packagePath()
     val cType = type.capitalised()
+
+    description = "Fastutil $cType Big Lists"
 
     dependencies {
         "api"(project(":modules:commons:$type-common"))

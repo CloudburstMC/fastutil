@@ -1,5 +1,5 @@
 subprojects {
-    apply(plugin = "fastutil")
+    apply(plugin = "fastutil.module")
 
     group = "org.cloudburstmc.fastutil.maps"
 
@@ -8,6 +8,8 @@ subprojects {
     val pkg = key.packagePath()
     val cType = key.capitalised()
     val valCType = value.capitalised()
+
+    description = "Fastutil $cType to $valCType Maps"
 
     dependencies {
         "api"(project(":modules:sets:object-sets"))
