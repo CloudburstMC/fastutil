@@ -1,3 +1,6 @@
+import org.eclipse.jgit.internal.storage.file.FileRepository
+import org.eclipse.jgit.lib.Constants
+import org.eclipse.jgit.lib.RepositoryBuilder
 import org.gradle.api.Project
 
 const val PKG = "it/unimi/dsi/fastutil"
@@ -60,4 +63,23 @@ fun getCoreIncludes(): Set<String> {
         }
     }
     return includes
+}
+
+fun Project.isRelease(): Boolean {
+    // Find the git repository and check if the HEAD is tagged
+    val repository = RepositoryBuilder()
+        .findGitDir(project.rootDir)
+        .setMustExist(true)
+        .readEnvironment()
+        .build()
+
+    val headRef = repository.findRef("HEAD")!!
+    repository.refDatabase.getRefsByPrefix(Constants.R_TAGS).forEach { ref ->
+        if (ref.objectId.equals(headRef.objectId)) {
+            println("Release build. Tag found for ${headRef.objectId.name}")
+            return true
+        }
+    }
+    println("Snapshot build. No tag found for ${headRef.objectId.name}")
+    return false
 }
