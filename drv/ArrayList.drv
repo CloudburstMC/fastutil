@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2023 Sebastiano Vigna
+ * Copyright (C) 2002-2024 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1001,7 +1001,7 @@ public class ARRAY_LIST KEY_GENERIC extends ABSTRACT_LIST KEY_GENERIC implements
 				@Override
 				public int back(int n) {
 					if (n < 0) throw new IllegalArgumentException("Argument must be nonnegative: " + n);
-					final int remaining = size - pos;
+					final int remaining = pos;
 					if (n < remaining) {
 						pos -= n;
 					} else {
