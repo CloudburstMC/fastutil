@@ -16,6 +16,7 @@
 
 package it.unimi.dsi.fastutil.ints;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -147,6 +148,7 @@ public class IntArrayListTest {
 		assertEquals(IntArrayList.wrap(new int[] { 24, 86, 42 }), list);
 	}
 
+	@Test
 	public void testAddAll() {
 		final IntArrayList l = IntArrayList.wrap(new int[] { 0, 1 });
 		l.addAll(IntArrayList.wrap(new int[] { 2, 3 } ));
@@ -186,6 +188,7 @@ public class IntArrayListTest {
 		assertEquals(IntArrayList.wrap(new int[] { 0, 2 }), l);
 	}
 
+	@Test
 	public void testSort() {
 		final IntArrayList l = IntArrayList.wrap(new int[] { 4, 2, 1, 3 });
 		l.sort(null);
@@ -604,5 +607,11 @@ public class IntArrayListTest {
 	@Test
 	public void testZeroLengthToArray() {
 		assertSame(IntArrays.EMPTY_ARRAY, new IntArrayList().toIntArray());
+	}
+
+	@Test
+	public void testOversizedToArray() {
+		final IntArrayList l = IntArrayList.of(0, 1, 2, 3);
+		assertArrayEquals(new int[]{0, 1, 2, 3, 0}, l.toArray(new int[5]));
 	}
 }
